@@ -1,0 +1,51 @@
+﻿<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dolmuş NET — الراكب</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, sans-serif; background: #f5f7fa; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }
+  h1 { color: #1E88E5; font-size: 28px; margin-bottom: 8px; }
+  p { color: #666; font-size: 14px; margin-bottom: 24px; }
+  .card { background: white; border-radius: 16px; padding: 24px; width: 100%; max-width: 400px; box-shadow: 0 2px 12px rgba(0,0,0,0.1); text-align: center; }
+  .btn { display: block; width: 100%; padding: 14px; border-radius: 12px; border: none; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 12px; }
+  .btn-primary { background: #1E88E5; color: white; }
+  .status { margin-top: 16px; font-size: 13px; color: #888; }
+  .bus-icon { font-size: 48px; margin-bottom: 16px; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="bus-icon">🚌</div>
+  <h1>Dolmuş NET</h1>
+  <p>تتبع الحافلات في الوقت الفعلي</p>
+  <button class="btn btn-primary" onclick="getLocation()">📍 تحديد موقعي</button>
+  <div class="status" id="status">اضغط لتحديد موقعك</div>
+</div>
+<script>
+  let userLat = null;
+  let userLng = null;
+  function getLocation() {
+    const status = document.getElementById('status');
+    status.textContent = 'جاري تحديد موقعك...';
+    if (!navigator.geolocation) {
+      status.textContent = 'المتصفح لا يدعم GPS';
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        userLat = pos.coords.latitude;
+        userLng = pos.coords.longitude;
+        status.textContent = 'تم تحديد موقعك: ' + userLat.toFixed(4) + ', ' + userLng.toFixed(4);
+      },
+      (err) => {
+        status.textContent = 'تعذر تحديد الموقع - تأكد من تفعيل GPS';
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  }
+</script>
+</body>
+</html>
