@@ -21,6 +21,8 @@
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:'Cairo',sans-serif;background:var(--bg);min-height:100vh;color:var(--text)}
+/* إزالة الخلفية الافتراضية لـ Leaflet divIcon */
+.bus-marker-icon{background:transparent!important;border:none!important;}
 .hdr{background:var(--blue);padding:14px 16px 22px;color:#fff;display:flex;align-items:center;gap:10px}
 .hdr-logo{font-size:26px}
 .hdr-title{flex:1}
@@ -73,8 +75,6 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);min-height:100vh;color:
 .direction-tab{display:inline-block;font-size:11px;padding:2px 8px;border-radius:6px;font-weight:700;margin-right:4px}
 .dir-go{background:#E3F2FD;color:#1565C0}
 .dir-back{background:#F3E5F5;color:#6A1B9A}
-
-/* ── debug panel ── */
 .debug-panel{background:#1A2332;color:#A5D6A7;font-family:monospace;font-size:11px;border-radius:10px;padding:12px;margin-bottom:12px;white-space:pre-wrap;word-break:break-all;max-height:180px;overflow-y:auto;display:none}
 .debug-panel.show{display:block}
 .debug-toggle{background:none;border:1.5px solid var(--border);border-radius:9px;padding:4px 10px;font-size:11px;font-family:'Cairo',sans-serif;color:var(--muted);cursor:pointer;margin-bottom:6px}
@@ -124,11 +124,8 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);min-height:100vh;color:
       <button class="refresh-btn" onclick="loadBuses()">🔄 تحديث</button>
     </div>
     <div class="update-time" id="updateTime"></div>
-
-    <!-- زر التشخيص — يمكن حذفه لاحقاً -->
     <button class="debug-toggle" onclick="toggleDebug()">🛠 عرض بيانات التشخيص</button>
     <div class="debug-panel" id="debugPanel"></div>
-
     <div id="busesList"></div>
   </div>
 
@@ -149,14 +146,12 @@ let selectedColor='#1E88E5';
 let busInterval=null;
 let routeColorMap={};
 
-/* ─── helpers ─── */
-function sbGet(table, params=''){
+function sbGet(table,params=''){
   return fetch(`${SB_URL}/rest/v1/${table}${params}`,
-    {headers:{apikey:SB_KEY, Authorization:'Bearer '+SB_KEY}})
-    .then(r=>r.json());
+    {headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY}}).then(r=>r.json());
 }
 function calcDist(la1,lo1,la2,lo2){
-  const R=6371000, dL=(la2-la1)*Math.PI/180, dO=(lo2-lo1)*Math.PI/180;
+  const R=6371000,dL=(la2-la1)*Math.PI/180,dO=(lo2-lo1)*Math.PI/180;
   const a=Math.sin(dL/2)**2+Math.cos(la1*Math.PI/180)*Math.cos(la2*Math.PI/180)*Math.sin(dO/2)**2;
   return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
 }
@@ -165,14 +160,13 @@ function escH(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')
 function nowTime(){return new Date().toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'});}
 function dbg(msg){
   const p=document.getElementById('debugPanel');
-  p.textContent+= '\n' + msg;
+  p.textContent+='\n'+msg;
   p.scrollTop=p.scrollHeight;
 }
 function toggleDebug(){
   document.getElementById('debugPanel').classList.toggle('show');
 }
 
-/* ─── location ─── */
 function getLocation(){
   const row=document.getElementById('locRow');
   const lt=document.getElementById('locText');
@@ -181,23 +175,22 @@ function getLocation(){
   lt.textContent='جاري تحديد موقعك...';
   la.innerHTML='<span class="spinner"></span>';
   if(!navigator.geolocation){
-    row.className='loc-row err'; lt.textContent='المتصفح لا يدعم GPS'; la.textContent='❌'; return;
+    row.className='loc-row err';lt.textContent='المتصفح لا يدعم GPS';la.textContent='❌';return;
   }
   navigator.geolocation.getCurrentPosition(
     pos=>{
-      userLat=pos.coords.latitude; userLng=pos.coords.longitude;
+      userLat=pos.coords.latitude;userLng=pos.coords.longitude;
       row.className='loc-row ok';
       lt.textContent='تم تحديد موقعك ✅';
       document.getElementById('locSub').textContent=userLat.toFixed(5)+' , '+userLng.toFixed(5);
       la.textContent='✅';
       initMap();
     },
-    ()=>{row.className='loc-row err'; lt.textContent='تعذّر تحديد الموقع — تأكد من GPS'; la.textContent='↩';},
-    {enableHighAccuracy:true, timeout:12000}
+    ()=>{row.className='loc-row err';lt.textContent='تعذّر تحديد الموقع — تأكد من GPS';la.textContent='↩';},
+    {enableHighAccuracy:true,timeout:12000}
   );
 }
 
-/* ─── map init ─── */
 function initMap(){
   document.getElementById('mapCard').classList.remove('hidden');
   document.getElementById('routesCard').classList.remove('hidden');
@@ -209,14 +202,13 @@ function initMap(){
   const uIcon=L.divIcon({
     className:'',
     html:`<div style="width:16px;height:16px;background:#1565C0;border:3px solid #fff;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,.4)"></div>`,
-    iconSize:[16,16], iconAnchor:[8,8]
+    iconSize:[16,16],iconAnchor:[8,8]
   });
   userMarker=L.marker([userLat,userLng],{icon:uIcon,zIndexOffset:1000})
     .addTo(map).bindPopup('📍 موقعك الحالي');
   loadRoutes();
 }
 
-/* ─── routes ─── */
 async function loadRoutes(){
   document.getElementById('routesGrid').innerHTML=
     '<div class="empty"><div class="empty-e">⏳</div>جاري تحميل الخطوط...</div>';
@@ -307,7 +299,7 @@ function renderRouteList(grouped){
   }).join('');
 }
 
-function selectRoute(rName, color){
+function selectRoute(rName,color){
   selectedRouteName=rName;
   selectedColor=color||routeColorMap[rName]||'#1E88E5';
   Object.entries(routePolylines).forEach(([name,layers])=>{
@@ -323,103 +315,83 @@ function selectRoute(rName, color){
     const btn=document.getElementById('rbtn-'+CSS.escape(rName));
     if(btn) btn.classList.add('active');
     const badge=document.getElementById('rbadge-'+CSS.escape(rName));
-    if(badge){badge.className='route-badge rb-active'; badge.textContent='✅ محدد';}
+    if(badge){badge.className='route-badge rb-active';badge.textContent='✅ محدد';}
   }catch(e){}
   document.getElementById('busesTitle').innerHTML=
     `🚌 الحافلات الفعالة &mdash; <span style="color:${selectedColor};font-weight:700">${escH(rName)}</span>`;
   document.getElementById('busesCard').classList.remove('hidden');
-
-  // إعادة ضبط لوح التشخيص
-  const dp=document.getElementById('debugPanel');
-  dp.textContent='';
-
+  document.getElementById('debugPanel').textContent='';
   clearInterval(busInterval);
   loadBuses();
-  busInterval=setInterval(loadBuses, 10000);
-  setTimeout(()=>document.getElementById('busesCard').scrollIntoView({behavior:'smooth'}), 300);
+  busInterval=setInterval(loadBuses,10000);
+  setTimeout(()=>document.getElementById('busesCard').scrollIntoView({behavior:'smooth'}),300);
 }
 
-/* ─── buses (FIXED) ─── */
 async function loadBuses(){
   if(!selectedRouteName) return;
   const list=document.getElementById('busesList');
   list.innerHTML='<div class="empty"><div class="empty-e">⏳</div>جاري التحميل...</div>';
-
-  // إزالة markers القديمة
   busMarkers.forEach(m=>m.remove());
   busMarkers=[];
-
   try{
-    // ✅ جلب البيانات
     const buses=await sbGet('live_locations',
       `?select=driver_name,route_name,lat,lng&route_name=eq.${encodeURIComponent(selectedRouteName)}`);
-
-    // ✅ تسجيل التشخيص
-    dbg('📡 الخط المحدد: ' + selectedRouteName);
-    dbg('📦 البيانات الخام: ' + JSON.stringify(buses, null, 2));
-
+    dbg('📡 الخط المحدد: '+selectedRouteName);
+    dbg('📦 البيانات الخام: '+JSON.stringify(buses,null,2));
     document.getElementById('updateTime').textContent='آخر تحديث: '+nowTime();
-
-    // ✅ التحقق من وجود بيانات
-    if(!Array.isArray(buses) || buses.length===0){
+    if(!Array.isArray(buses)||buses.length===0){
       dbg('⚠️ لا توجد سجلات في live_locations لهذا الخط');
       list.innerHTML='<div class="empty"><div class="empty-e">😴</div>لا توجد حافلات فعالة على هذا الخط الآن</div>';
       return;
     }
-
-    // ✅ تصفية الإحداثيات الصالحة فقط
     const validBuses=buses.filter(b=>{
       const lat=parseFloat(b.lat);
       const lng=parseFloat(b.lng);
-      const ok=!isNaN(lat) && !isNaN(lng) && lat!==0 && lng!==0;
+      const ok=!isNaN(lat)&&!isNaN(lng)&&lat!==0&&lng!==0;
       if(!ok) dbg('❌ إحداثيات غير صالحة: '+JSON.stringify(b));
       return ok;
     });
-
     dbg(`✅ حافلات صالحة: ${validBuses.length} من ${buses.length}`);
-
     if(validBuses.length===0){
-      dbg('⚠️ جميع السجلات تحتوي إحداثيات غير صالحة — تحقق من lat/lng في Supabase');
+      dbg('⚠️ جميع السجلات تحتوي إحداثيات غير صالحة');
       list.innerHTML='<div class="empty"><div class="empty-e">⚠️</div>البيانات موجودة لكن الإحداثيات غير صالحة<br><small>اضغط "عرض بيانات التشخيص" للتفاصيل</small></div>';
       return;
     }
 
-    // ✅ رسم markers على الخريطة
     validBuses.forEach(b=>{
       const lat=parseFloat(b.lat);
       const lng=parseFloat(b.lng);
       dbg(`🚌 إضافة marker: ${b.driver_name} @ [${lat}, ${lng}]`);
+
+      /* ✅ الإيقونة بدون دائرة — إيموجي + بطاقة اسم واضحة */
       const bIcon=L.divIcon({
-        className:'',
+        className:'bus-marker-icon',
         html:`<div style="display:flex;flex-direction:column;align-items:center;gap:2px">
-          <div style="font-size:28px;line-height:1;filter:drop-shadow(0 2px 4px rgba(0,0,0,.35))">🚌</div>
-          <div style="background:rgba(21,101,192,.92);color:#fff;font-family:Cairo,sans-serif;font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;white-space:nowrap;box-shadow:0 1px 4px rgba(0,0,0,.3);max-width:100px;text-align:center;line-height:1.4">
-            ${escH(b.driver_name)}<br>
-            <span style="font-weight:400;opacity:.85">${escH(b.route_name)}</span>
+          <div style="font-size:30px;line-height:1;filter:drop-shadow(0 2px 5px rgba(0,0,0,.5))">🚌</div>
+          <div style="background:#1565C0;color:#fff;font-family:Cairo,sans-serif;padding:3px 10px;border-radius:8px;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,.4);text-align:center;line-height:1.5;border:1.5px solid rgba(255,255,255,.5)">
+            <div style="font-size:12px;font-weight:700">${escH(b.driver_name)}</div>
+            <div style="font-size:11px;font-weight:600;opacity:.9">${escH(b.route_name)}</div>
           </div>
         </div>`,
-        iconSize:[100,60], iconAnchor:[50,28]
+        iconSize:[130,72],iconAnchor:[65,34]
       });
+
       const m=L.marker([lat,lng],{icon:bIcon,zIndexOffset:500})
         .addTo(map)
-        .bindPopup(`<div style="font-family:Cairo;min-width:140px"><b>${escH(b.driver_name)}</b><br><span style="color:#607D8B;font-size:12px">الخط: ${escH(b.route_name)}</span><br><span style="color:#607D8B;font-size:11px">${lat.toFixed(5)}, ${lng.toFixed(5)}</span></div>`);
+        .bindPopup(`<div style="font-family:Cairo;min-width:140px"><b>${escH(b.driver_name)}</b><br><span style="color:#607D8B;font-size:12px">الخط: ${escH(b.route_name)}</span></div>`);
       busMarkers.push(m);
     });
 
-    // ✅ تحريك الخريطة لتشمل جميع الحافلات
     if(busMarkers.length===1){
-      const b=validBuses[0];
-      map.setView([parseFloat(b.lat), parseFloat(b.lng)], 15);
+      map.setView([parseFloat(validBuses[0].lat),parseFloat(validBuses[0].lng)],15);
     } else if(busMarkers.length>1){
-      const group=L.featureGroup(busMarkers);
-      map.fitBounds(group.getBounds().pad(0.3));
+      map.fitBounds(L.featureGroup(busMarkers).getBounds().pad(0.3));
     }
 
-    // ✅ عرض قائمة الحافلات
     list.innerHTML=validBuses.map(b=>{
       const lat=parseFloat(b.lat);
       const lng=parseFloat(b.lng);
-      const dist=(userLat!=null && lat)?calcDist(userLat,userLng,lat,lng):null;
+      const dist=(userLat!=null)?calcDist(userLat,userLng,lat,lng):null;
       const mins=dist?Math.max(1,Math.round(dist/300)):null;
       return `<div class="bus-row">
         <div class="bus-icon">🚌</div>
@@ -434,10 +406,9 @@ async function loadBuses(){
         </div>
       </div>`;
     }).join('');
-
   }catch(e){
-    console.error('loadBuses error:', e);
-    dbg('💥 خطأ: ' + e.message);
+    console.error('loadBuses error:',e);
+    dbg('💥 خطأ: '+e.message);
     list.innerHTML='<div class="empty"><div class="empty-e">❌</div>خطأ في الاتصال: '+escH(e.message)+'</div>';
   }
 }
