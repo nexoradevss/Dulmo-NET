@@ -1,28 +1,417 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html dir="rtl" lang="ar">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dolmus NET</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#1565C0">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Dolmuş NET — الراكب</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:Arial,sans-serif;background:#F5F7FA;min-height:100vh;display:flex;align-items:center;justify-content:center}
-.container{text-align:center;padding:32px 24px;max-width:400px;width:100%}
-.logo{font-size:48px;margin-bottom:8px}
-h1{font-size:26px;font-weight:bold;color:#1E88E5;margin-bottom:8px}
-p{font-size:14px;color:#888;margin-bottom:40px}
-.btn{display:block;width:100%;padding:18px;border-radius:14px;font-size:17px;font-weight:bold;text-decoration:none;margin-bottom:16px}
-.btn-passenger{background:#1E88E5;color:white}
-.btn-driver{background:white;color:#1E88E5;border:2px solid #1E88E5}
+:root{
+  --blue:#1565C0;--blue-mid:#1E88E5;--blue-light:#E3F2FD;
+  --green:#2E7D32;--green-light:#E8F5E9;
+  --amber:#E65100;--amber-light:#FFF3E0;
+  --red:#C62828;--red-light:#FFEBEE;
+  --bg:#F0F4F8;--card:#fff;--border:#CFD8DC;
+  --text:#1A2332;--muted:#607D8B;
+  --r:14px;--shadow:0 2px 14px rgba(21,101,192,.1);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Cairo',sans-serif;background:var(--bg);min-height:100vh;color:var(--text)}
+/* إزالة الخلفية الافتراضية لـ Leaflet divIcon */
+.bus-marker-icon{background:transparent!important;border:none!important;}
+.hdr{background:var(--blue);padding:8px 14px 14px;color:#fff;display:flex;align-items:center;gap:10px}
+.hdr-logo{font-size:20px}
+.hdr-title{flex:1}
+.hdr-title h1{font-size:16px;font-weight:700}
+.hdr-title p{display:none}
+.hdr-user{display:none}
+.wrap{max-width:520px;margin:-6px auto 0;padding:0 10px 30px}
+.card{background:var(--card);border-radius:var(--r);padding:10px 12px;margin-bottom:8px;box-shadow:var(--shadow);border:1px solid var(--border)}
+.card-title{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:5px}
+.loc-row{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:11px;cursor:pointer;border:1.5px solid transparent;transition:.2s;font-size:13px;font-weight:600}
+.loc-row.idle{background:var(--blue-light);color:var(--blue);border-color:#90CAF9}
+.loc-row.loading{background:var(--amber-light);color:var(--amber);border-color:#FFCC80}
+.loc-row.ok{background:var(--green-light);color:var(--green);border-color:#A5D6A7}
+.loc-row.err{background:var(--red-light);color:var(--red);border-color:#EF9A9A}
+.loc-body{flex:1}
+.loc-sub{font-size:11px;font-weight:400;opacity:.75;margin-top:1px}
+#map{height:420px;border-radius:12px;border:1.5px solid var(--border);overflow:hidden;z-index:0}
+.map-hint{display:none}
+.routes-grid{display:flex;flex-direction:column;gap:5px}
+.route-btn{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:10px;border:1.5px solid var(--border);background:#fff;cursor:pointer;transition:.2s;width:100%;font-family:'Cairo',sans-serif}
+.route-btn:hover{border-color:var(--blue-mid);background:var(--blue-light)}
+.route-btn.active{border-color:var(--blue);background:var(--blue-light);box-shadow:0 0 0 3px rgba(30,136,229,.15)}
+.route-dot{width:14px;height:14px;border-radius:50%;flex-shrink:0}
+.route-btn-info{flex:1;text-align:right}
+.route-btn-name{font-size:13px;font-weight:700;color:var(--text)}
+.route-btn-meta{font-size:11px;color:var(--muted);margin-top:0}
+.route-badge{font-size:11px;font-weight:700;padding:3px 8px;border-radius:7px;white-space:nowrap;flex-shrink:0}
+.rb-active{background:var(--green-light);color:var(--green)}
+.rb-idle{background:#ECEFF1;color:var(--muted)}
+.bus-row{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--border);border-radius:11px;padding:11px 13px;margin-bottom:8px}
+.bus-icon{font-size:24px;flex-shrink:0}
+.bus-body{flex:1}
+.bus-name{font-size:14px;font-weight:700}
+.bus-meta{font-size:12px;color:var(--muted);margin-top:2px}
+.bus-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
+.bus-status{font-size:11px;font-weight:700;padding:3px 8px;border-radius:8px;white-space:nowrap}
+.bs-on{background:var(--green-light);color:var(--green)}
+.bs-off{background:var(--amber-light);color:var(--amber)}
+.bus-dist{font-size:12px;font-weight:700;color:var(--blue)}
+.bus-eta{font-size:11px;color:var(--muted)}
+.spinner{display:inline-block;width:15px;height:15px;border:2px solid rgba(0,0,0,.12);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-left:5px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.empty{text-align:center;padding:22px 10px;color:var(--muted);font-size:13px}
+.empty-e{font-size:28px;margin-bottom:6px}
+.refresh-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.refresh-btn{background:none;border:1.5px solid var(--border);border-radius:9px;padding:5px 11px;font-size:12px;font-family:'Cairo',sans-serif;color:var(--muted);cursor:pointer;transition:.2s}
+.refresh-btn:hover{border-color:var(--blue-mid);color:var(--blue)}
+.update-time{font-size:11px;color:var(--muted);margin-bottom:8px}
+.hidden{display:none!important}
+.direction-tab{display:inline-block;font-size:11px;padding:2px 8px;border-radius:6px;font-weight:700;margin-right:4px}
+.dir-go{background:#E3F2FD;color:#1565C0}
+.dir-back{background:#F3E5F5;color:#6A1B9A}
+.debug-panel{background:#1A2332;color:#A5D6A7;font-family:monospace;font-size:11px;border-radius:10px;padding:12px;margin-bottom:12px;white-space:pre-wrap;word-break:break-all;max-height:180px;overflow-y:auto;display:none}
+.debug-panel.show{display:block}
+.debug-toggle{background:none;border:1.5px solid var(--border);border-radius:9px;padding:4px 10px;font-size:11px;font-family:'Cairo',sans-serif;color:var(--muted);cursor:pointer;margin-bottom:6px}
 </style>
 </head>
 <body>
-<div class="container">
-<div class="logo">🚌</div>
-<h1>Dolmuş NET</h1>
-<p>اختر نوع الاستخدام</p>
-<a href="passenger.html" class="btn btn-passenger">🧍 واجهة الراكب</a>
-<a href="https://github.com/mohamadyuonsos-beep/Dulmo-NET/raw/main/app-debug.apk" class="btn btn-driver">🚗 تطبيق السائق</a>
+ 
+<div class="hdr">
+  <div class="hdr-logo">🚌</div>
+  <div class="hdr-title">
+    <h1>Dolmuş NET</h1>
+    <p>تتبع الحافلات في الوقت الفعلي</p>
+  </div>
+  <div class="hdr-user" id="hdrUser">🧑‍💼 الراكب</div>
 </div>
+ 
+<div class="wrap">
+ 
+  <div class="card">
+    <div class="card-title">📍 موقعك الحالي</div>
+    <div class="loc-row idle" id="locRow" onclick="getLocation()">
+      <div style="font-size:20px;flex-shrink:0">📍</div>
+      <div class="loc-body">
+        <div id="locText">اضغط لتحديد موقعك</div>
+        <div class="loc-sub" id="locSub"></div>
+      </div>
+      <div id="locAction">اضغط</div>
+    </div>
+  </div>
+ 
+  <div class="card hidden" id="mapCard">
+    <div class="card-title">🗺️ خريطة المسارات</div>
+    <div id="map"></div>
+    <div class="map-hint">اضغط على مسار أو اختره من القائمة أدناه</div>
+  </div>
+ 
+  <div class="card hidden" id="routesCard">
+    <div class="card-title">🚌 اختر الخط</div>
+    <div class="routes-grid" id="routesGrid">
+      <div class="empty"><div class="empty-e">⏳</div>جاري تحميل الخطوط...</div>
+    </div>
+  </div>
+ 
+  <div class="card hidden" id="busesCard">
+    <div class="refresh-row">
+      <div class="card-title" style="margin-bottom:0" id="busesTitle">🚌 الحافلات الفعالة</div>
+      <button class="refresh-btn" onclick="loadBuses()">🔄 تحديث</button>
+    </div>
+    <div class="update-time" id="updateTime"></div>
+    <button class="debug-toggle" onclick="toggleDebug()">🛠 عرض بيانات التشخيص</button>
+    <div class="debug-panel" id="debugPanel"></div>
+    <div id="busesList"></div>
+  </div>
+ 
+</div>
+ 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const SB_URL = 'https://ezmvwhpmvuokrrvsohuv.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV6bXZ3aHBtdnVva3JydnNvaHV2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTcxNDQsImV4cCI6MjA5NDI3MzE0NH0.je77PXmfbjR9H7TWzVhpQ4Kt6mTRiI0UfS9pHQzpHhU';
+const COLORS = ['#1E88E5','#E53935','#43A047','#FB8C00','#8E24AA','#00ACC1','#F4511E','#3949AB','#00897B','#D81B60'];
+ 
+let userLat=null, userLng=null;
+let map=null, userMarker=null;
+let busMarkers=[];
+let routePolylines={};
+let selectedRouteName=null;
+let selectedColor='#1E88E5';
+let busInterval=null;
+let routeColorMap={};
+ 
+function sbGet(table,params=''){
+  return fetch(`${SB_URL}/rest/v1/${table}${params}`,
+    {headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY}}).then(r=>r.json());
+}
+function calcDist(la1,lo1,la2,lo2){
+  const R=6371000,dL=(la2-la1)*Math.PI/180,dO=(lo2-lo1)*Math.PI/180;
+  const a=Math.sin(dL/2)**2+Math.cos(la1*Math.PI/180)*Math.cos(la2*Math.PI/180)*Math.sin(dO/2)**2;
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+function fmtDist(m){return m<1000?Math.round(m)+'م':(m/1000).toFixed(1)+'كم';}
+function escH(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function nowTime(){return new Date().toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'});}
+function dbg(msg){
+  const p=document.getElementById('debugPanel');
+  p.textContent+='\n'+msg;
+  p.scrollTop=p.scrollHeight;
+}
+function toggleDebug(){
+  document.getElementById('debugPanel').classList.toggle('show');
+}
+ 
+function getLocation(){
+  const row=document.getElementById('locRow');
+  const lt=document.getElementById('locText');
+  const la=document.getElementById('locAction');
+  row.className='loc-row loading';
+  lt.textContent='جاري تحديد موقعك...';
+  la.innerHTML='<span class="spinner"></span>';
+  if(!navigator.geolocation){
+    row.className='loc-row err';lt.textContent='المتصفح لا يدعم GPS';la.textContent='❌';return;
+  }
+  navigator.geolocation.getCurrentPosition(
+    pos=>{
+      userLat=pos.coords.latitude;userLng=pos.coords.longitude;
+      row.className='loc-row ok';
+      lt.textContent='تم تحديد موقعك ✅';
+      document.getElementById('locSub').textContent=userLat.toFixed(5)+' , '+userLng.toFixed(5);
+      la.textContent='✅';
+      initMap();
+    },
+    ()=>{row.className='loc-row err';lt.textContent='تعذّر تحديد الموقع — تأكد من GPS';la.textContent='↩';},
+    {enableHighAccuracy:true,timeout:12000}
+  );
+}
+ 
+function initMap(){
+  document.getElementById('mapCard').classList.remove('hidden');
+  document.getElementById('routesCard').classList.remove('hidden');
+  if(!map){
+    map=L.map('map',{zoomControl:true,attributionControl:false}).setView([userLat,userLng],14);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(map);
+  }
+  if(userMarker) userMarker.remove();
+  const uIcon=L.divIcon({
+    className:'',
+    html:`<div style="width:16px;height:16px;background:#1565C0;border:3px solid #fff;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,.4)"></div>`,
+    iconSize:[16,16],iconAnchor:[8,8]
+  });
+  userMarker=L.marker([userLat,userLng],{icon:uIcon,zIndexOffset:1000})
+    .addTo(map).bindPopup('📍 موقعك الحالي');
+  loadRoutes();
+}
+ 
+async function loadRoutes(){
+  document.getElementById('routesGrid').innerHTML=
+    '<div class="empty"><div class="empty-e">⏳</div>جاري تحميل الخطوط...</div>';
+  try{
+    const rows=await sbGet('routes','?select=id,route_name,direction,points,city&order=route_name');
+    if(!Array.isArray(rows)||rows.length===0){
+      document.getElementById('routesGrid').innerHTML=
+        '<div class="empty"><div class="empty-e">🚫</div>لا توجد خطوط محفوظة</div>';
+      return;
+    }
+    const grouped={};
+    rows.forEach(r=>{
+      if(!grouped[r.route_name]) grouped[r.route_name]=[];
+      grouped[r.route_name].push(r);
+    });
+    Object.values(routePolylines).forEach(arr=>arr.forEach(l=>l&&l.remove&&l.remove()));
+    routePolylines={};
+    const bounds=[];
+    const routeNames=Object.keys(grouped);
+    routeNames.forEach((rName,idx)=>{
+      const color=COLORS[idx%COLORS.length];
+      routeColorMap[rName]=color;
+      routePolylines[rName]=[];
+      grouped[rName].forEach(seg=>{
+        const pts=seg.points||[];
+        if(pts.length<2) return;
+        const latlngs=pts.map(p=>[parseFloat(p.lat),parseFloat(p.lng)]);
+        latlngs.forEach(p=>bounds.push(p));
+        const isDash=seg.direction==='returning';
+        const poly=L.polyline(latlngs,{color,weight:5,opacity:.75,dashArray:isDash?'10,8':null}).addTo(map);
+        poly.on('click',()=>selectRoute(rName,color));
+        routePolylines[rName].push(poly);
+        const first=latlngs[0];
+        const startDot=L.circleMarker(first,{radius:7,color:'#fff',weight:2,fillColor:color,fillOpacity:1})
+          .addTo(map).bindPopup(`<b style="font-family:Cairo">${escH(rName)}</b><br>${seg.direction==='going'?'بداية الذهاب':'بداية العودة'}`);
+        routePolylines[rName].push(startDot);
+        const last=latlngs[latlngs.length-1];
+        const endDot=L.circleMarker(last,{radius:7,color:'#fff',weight:2,fillColor:color,fillOpacity:1})
+          .addTo(map).bindPopup(`<b style="font-family:Cairo">${escH(rName)}</b><br>${seg.direction==='going'?'نهاية الذهاب':'نهاية العودة'}`);
+        routePolylines[rName].push(endDot);
+      });
+      const firstSeg=grouped[rName].find(s=>s.direction==='going')||grouped[rName][0];
+      const pts=firstSeg.points||[];
+      if(pts.length>0){
+        const mid=pts[Math.floor(pts.length/2)];
+        const lbl=L.divIcon({
+          className:'',
+          html:`<div style="background:${color};color:#fff;font-family:Cairo,sans-serif;font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;white-space:nowrap;box-shadow:0 1px 5px rgba(0,0,0,.3)">${escH(rName)}</div>`,
+          iconAnchor:[30,10]
+        });
+        const lblMarker=L.marker([parseFloat(mid.lat),parseFloat(mid.lng)],{icon:lbl,interactive:false}).addTo(map);
+        routePolylines[rName].push(lblMarker);
+      }
+    });
+    if(bounds.length) map.fitBounds(bounds,{padding:[30,30]});
+    renderRouteList(grouped);
+  }catch(e){
+    console.error(e);
+    document.getElementById('routesGrid').innerHTML=
+      '<div class="empty"><div class="empty-e">❌</div>خطأ في تحميل الخطوط: '+escH(e.message)+'</div>';
+  }
+}
+ 
+function renderRouteList(grouped){
+  const grid=document.getElementById('routesGrid');
+  const names=Object.keys(grouped);
+  if(names.length===0){
+    grid.innerHTML='<div class="empty"><div class="empty-e">🚫</div>لا توجد خطوط</div>';
+    return;
+  }
+  grid.innerHTML=names.map(rName=>{
+    const color=routeColorMap[rName]||'#1E88E5';
+    const segs=grouped[rName];
+    const hasGoing=segs.some(s=>s.direction==='going');
+    const hasReturn=segs.some(s=>s.direction==='returning');
+    const isActive=selectedRouteName===rName;
+    return `<button class="route-btn${isActive?' active':''}" id="rbtn-${CSS.escape(rName)}" onclick="selectRoute('${escH(rName).replace(/'/g,"\\'")}','${color}')">
+      <div class="route-dot" style="background:${color}"></div>
+      <div class="route-btn-info">
+        <div class="route-btn-name">${escH(rName)}</div>
+        <div class="route-btn-meta">
+          ${hasGoing?'<span class="direction-tab dir-go">ذهاب</span>':''}
+          ${hasReturn?'<span class="direction-tab dir-back">عودة</span>':''}
+        </div>
+      </div>
+      <div class="route-badge ${isActive?'rb-active':'rb-idle'}" id="rbadge-${CSS.escape(rName)}">${isActive?'✅ محدد':'اختر'}</div>
+    </button>`;
+  }).join('');
+}
+ 
+function selectRoute(rName,color){
+  selectedRouteName=rName;
+  selectedColor=color||routeColorMap[rName]||'#1E88E5';
+  Object.entries(routePolylines).forEach(([name,layers])=>{
+    layers.forEach(l=>{
+      if(!l||!l.setStyle) return;
+      if(name===rName) l.setStyle({weight:7,opacity:1});
+      else l.setStyle({weight:3,opacity:.2});
+    });
+  });
+  document.querySelectorAll('.route-btn').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.route-badge').forEach(el=>{el.className='route-badge rb-idle';el.textContent='اختر';});
+  try{
+    const btn=document.getElementById('rbtn-'+CSS.escape(rName));
+    if(btn) btn.classList.add('active');
+    const badge=document.getElementById('rbadge-'+CSS.escape(rName));
+    if(badge){badge.className='route-badge rb-active';badge.textContent='✅ محدد';}
+  }catch(e){}
+  document.getElementById('busesTitle').innerHTML=
+    `🚌 الحافلات الفعالة &mdash; <span style="color:${selectedColor};font-weight:700">${escH(rName)}</span>`;
+  document.getElementById('busesCard').classList.remove('hidden');
+  document.getElementById('debugPanel').textContent='';
+  clearInterval(busInterval);
+  loadBuses();
+  busInterval=setInterval(loadBuses,10000);
+  setTimeout(()=>document.getElementById('busesCard').scrollIntoView({behavior:'smooth'}),300);
+}
+ 
+async function loadBuses(){
+  if(!selectedRouteName) return;
+  const list=document.getElementById('busesList');
+  list.innerHTML='<div class="empty"><div class="empty-e">⏳</div>جاري التحميل...</div>';
+  busMarkers.forEach(m=>m.remove());
+  busMarkers=[];
+  try{
+    const buses=await sbGet('live_locations',
+      `?select=driver_name,route_name,lat,lng&route_name=eq.${encodeURIComponent(selectedRouteName)}`);
+    dbg('📡 الخط المحدد: '+selectedRouteName);
+    dbg('📦 البيانات الخام: '+JSON.stringify(buses,null,2));
+    document.getElementById('updateTime').textContent='آخر تحديث: '+nowTime();
+    if(!Array.isArray(buses)||buses.length===0){
+      dbg('⚠️ لا توجد سجلات في live_locations لهذا الخط');
+      list.innerHTML='<div class="empty"><div class="empty-e">😴</div>لا توجد حافلات فعالة على هذا الخط الآن</div>';
+      return;
+    }
+    const validBuses=buses.filter(b=>{
+      const lat=parseFloat(b.lat);
+      const lng=parseFloat(b.lng);
+      const ok=!isNaN(lat)&&!isNaN(lng)&&lat!==0&&lng!==0;
+      if(!ok) dbg('❌ إحداثيات غير صالحة: '+JSON.stringify(b));
+      return ok;
+    });
+    dbg(`✅ حافلات صالحة: ${validBuses.length} من ${buses.length}`);
+    if(validBuses.length===0){
+      dbg('⚠️ جميع السجلات تحتوي إحداثيات غير صالحة');
+      list.innerHTML='<div class="empty"><div class="empty-e">⚠️</div>البيانات موجودة لكن الإحداثيات غير صالحة<br><small>اضغط "عرض بيانات التشخيص" للتفاصيل</small></div>';
+      return;
+    }
+ 
+    validBuses.forEach(b=>{
+      const lat=parseFloat(b.lat);
+      const lng=parseFloat(b.lng);
+      dbg(`🚌 إضافة marker: ${b.driver_name} @ [${lat}, ${lng}]`);
+ 
+      /* ✅ الإيقونة بدون دائرة — إيموجي + بطاقة اسم واضحة */
+      const bIcon=L.divIcon({
+        className:'bus-marker-icon',
+        html:`<div style="display:flex;flex-direction:column;align-items:center;gap:2px">
+          <div style="font-size:30px;line-height:1;filter:drop-shadow(0 2px 5px rgba(0,0,0,.5))">🚌</div>
+          <div style="background:#1565C0;color:#fff;font-family:Cairo,sans-serif;padding:3px 10px;border-radius:8px;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,.4);text-align:center;line-height:1.5;border:1.5px solid rgba(255,255,255,.5)">
+            <div style="font-size:12px;font-weight:700">${escH(b.driver_name)}</div>
+            <div style="font-size:11px;font-weight:600;opacity:.9">${escH(b.route_name)}</div>
+          </div>
+        </div>`,
+        iconSize:[130,72],iconAnchor:[65,34]
+      });
+ 
+      const m=L.marker([lat,lng],{icon:bIcon,zIndexOffset:500})
+        .addTo(map)
+        .bindPopup(`<div style="font-family:Cairo;min-width:140px"><b>${escH(b.driver_name)}</b><br><span style="color:#607D8B;font-size:12px">الخط: ${escH(b.route_name)}</span></div>`);
+      busMarkers.push(m);
+    });
+ 
+    if(busMarkers.length===1){
+      map.setView([parseFloat(validBuses[0].lat),parseFloat(validBuses[0].lng)],15);
+    } else if(busMarkers.length>1){
+      map.fitBounds(L.featureGroup(busMarkers).getBounds().pad(0.3));
+    }
+ 
+    list.innerHTML=validBuses.map(b=>{
+      const lat=parseFloat(b.lat);
+      const lng=parseFloat(b.lng);
+      const dist=(userLat!=null)?calcDist(userLat,userLng,lat,lng):null;
+      const mins=dist?Math.max(1,Math.round(dist/300)):null;
+      return `<div class="bus-row">
+        <div class="bus-icon">🚌</div>
+        <div class="bus-body">
+          <div class="bus-name">${escH(b.driver_name)}</div>
+          <div class="bus-meta">الخط: <b>${escH(b.route_name)}</b></div>
+        </div>
+        <div class="bus-right">
+          <div class="bus-status bs-on">🟢 متحرك</div>
+          ${dist!==null?`<div class="bus-dist">${fmtDist(dist)}</div>`:''}
+          ${mins?`<div class="bus-eta">~${mins} دقيقة</div>`:''}
+        </div>
+      </div>`;
+    }).join('');
+  }catch(e){
+    console.error('loadBuses error:',e);
+    dbg('💥 خطأ: '+e.message);
+    list.innerHTML='<div class="empty"><div class="empty-e">❌</div>خطأ في الاتصال: '+escH(e.message)+'</div>';
+  }
+}
+</script>
 </body>
 </html>
