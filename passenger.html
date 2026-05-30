@@ -1,4 +1,5 @@
-﻿cat > /mnt/user-data/outputs/passenger.html << 'HTMLEOF'
+﻿
+cat > /mnt/user-data/outputs/passenger.html << 'HTMLEOF'
 <!DOCTYPE html>
 <html dir="rtl" lang="ar">
 <head>
@@ -22,56 +23,74 @@
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:'Cairo',sans-serif;background:var(--bg);min-height:100vh;color:var(--text)}
-.hdr{background:var(--blue);padding:14px 16px 20px;color:#fff;display:flex;align-items:center;gap:10px}
+
+/* HEADER */
+.hdr{background:var(--blue);padding:14px 16px 22px;color:#fff;display:flex;align-items:center;gap:10px}
 .hdr-logo{font-size:26px}
 .hdr-title{flex:1}
 .hdr-title h1{font-size:18px;font-weight:700}
 .hdr-title p{font-size:12px;opacity:.8;margin-top:1px}
-.hdr-user{background:rgba(255,255,255,.18);border-radius:10px;padding:6px 10px;font-size:12px;font-weight:600;white-space:nowrap}
-.wrap{max-width:520px;margin:-8px auto 0;padding:0 14px 40px}
+.hdr-user{background:rgba(255,255,255,.18);border-radius:10px;padding:6px 10px;font-size:12px;font-weight:600;white-space:nowrap;text-align:center}
+
+/* WRAP */
+.wrap{max-width:520px;margin:-10px auto 0;padding:0 14px 40px}
+
+/* CARD */
 .card{background:var(--card);border-radius:var(--r);padding:16px;margin-bottom:12px;box-shadow:var(--shadow);border:1px solid var(--border)}
 .card-title{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:5px}
+
+/* LOCATION */
 .loc-row{display:flex;align-items:center;gap:10px;padding:11px 13px;border-radius:11px;cursor:pointer;border:1.5px solid transparent;transition:.2s;font-size:14px;font-weight:600}
 .loc-row.idle{background:var(--blue-light);color:var(--blue);border-color:#90CAF9}
 .loc-row.loading{background:var(--amber-light);color:var(--amber);border-color:#FFCC80}
 .loc-row.ok{background:var(--green-light);color:var(--green);border-color:#A5D6A7}
 .loc-row.err{background:var(--red-light);color:var(--red);border-color:#EF9A9A}
-.loc-icon{font-size:20px;flex-shrink:0}
 .loc-body{flex:1}
 .loc-sub{font-size:11px;font-weight:400;opacity:.75;margin-top:1px}
-#map{height:320px;border-radius:12px;border:1.5px solid var(--border);overflow:hidden;z-index:0}
+
+/* MAP */
+#map{height:340px;border-radius:12px;border:1.5px solid var(--border);overflow:hidden;z-index:0}
+.map-hint{margin-top:8px;font-size:12px;color:var(--muted);text-align:center}
+
+/* ROUTE BUTTONS */
 .routes-grid{display:flex;flex-direction:column;gap:8px}
-.route-btn{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:12px;border:1.5px solid var(--border);background:#fff;cursor:pointer;transition:.2s;text-align:right;width:100%}
+.route-btn{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:12px;border:1.5px solid var(--border);background:#fff;cursor:pointer;transition:.2s;width:100%;font-family:'Cairo',sans-serif}
 .route-btn:hover{border-color:var(--blue-mid);background:var(--blue-light)}
 .route-btn.active{border-color:var(--blue);background:var(--blue-light);box-shadow:0 0 0 3px rgba(30,136,229,.15)}
-.route-color{width:14px;height:14px;border-radius:50%;flex-shrink:0}
+.route-dot{width:14px;height:14px;border-radius:50%;flex-shrink:0}
 .route-btn-info{flex:1;text-align:right}
 .route-btn-name{font-size:14px;font-weight:700;color:var(--text)}
 .route-btn-meta{font-size:12px;color:var(--muted);margin-top:1px}
 .route-badge{font-size:11px;font-weight:700;padding:3px 8px;border-radius:7px;white-space:nowrap;flex-shrink:0}
 .rb-active{background:var(--green-light);color:var(--green)}
 .rb-idle{background:#ECEFF1;color:var(--muted)}
-.buses-section{display:none}
+
+/* BUSES */
 .bus-row{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--border);border-radius:11px;padding:11px 13px;margin-bottom:8px}
 .bus-icon{font-size:24px;flex-shrink:0}
 .bus-body{flex:1}
 .bus-name{font-size:14px;font-weight:700}
 .bus-meta{font-size:12px;color:var(--muted);margin-top:2px}
+.bus-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
 .bus-status{font-size:11px;font-weight:700;padding:3px 8px;border-radius:8px;white-space:nowrap}
-.bs-moving{background:var(--green-light);color:var(--green)}
-.bs-stop{background:var(--amber-light);color:var(--amber)}
-.bus-dist{font-size:12px;font-weight:600;color:var(--blue);white-space:nowrap}
-.spinner{display:inline-block;width:15px;height:15px;border:2px solid rgba(0,0,0,.15);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-left:5px}
+.bs-on{background:var(--green-light);color:var(--green)}
+.bs-off{background:var(--amber-light);color:var(--amber)}
+.bus-dist{font-size:12px;font-weight:700;color:var(--blue)}
+.bus-eta{font-size:11px;color:var(--muted)}
+
+/* MISC */
+.spinner{display:inline-block;width:15px;height:15px;border:2px solid rgba(0,0,0,.12);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-left:5px}
 @keyframes spin{to{transform:rotate(360deg)}}
-.empty{text-align:center;padding:20px 10px;color:var(--muted);font-size:13px}
-.empty .e{font-size:26px;margin-bottom:6px}
-.refresh-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.empty{text-align:center;padding:22px 10px;color:var(--muted);font-size:13px}
+.empty-e{font-size:28px;margin-bottom:6px}
+.refresh-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
 .refresh-btn{background:none;border:1.5px solid var(--border);border-radius:9px;padding:5px 11px;font-size:12px;font-family:'Cairo',sans-serif;color:var(--muted);cursor:pointer;transition:.2s}
 .refresh-btn:hover{border-color:var(--blue-mid);color:var(--blue)}
-.update-time{font-size:11px;color:var(--muted);margin-bottom:6px}
+.update-time{font-size:11px;color:var(--muted);margin-bottom:8px}
 .hidden{display:none!important}
-.map-hint{margin-top:8px;font-size:12px;color:var(--muted);text-align:center}
-.leaflet-container{font-family:'Cairo',sans-serif!important}
+.direction-tab{display:inline-block;font-size:11px;padding:2px 8px;border-radius:6px;font-weight:700;margin-right:4px}
+.dir-go{background:#E3F2FD;color:#1565C0}
+.dir-back{background:#F3E5F5;color:#6A1B9A}
 </style>
 </head>
 <body>
@@ -87,10 +106,11 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);min-height:100vh;color:
 
 <div class="wrap">
 
+  <!-- STEP 1: LOCATION -->
   <div class="card">
     <div class="card-title">📍 موقعك الحالي</div>
     <div class="loc-row idle" id="locRow" onclick="getLocation()">
-      <div class="loc-icon">📍</div>
+      <div style="font-size:20px;flex-shrink:0">📍</div>
       <div class="loc-body">
         <div id="locText">اضغط لتحديد موقعك</div>
         <div class="loc-sub" id="locSub"></div>
@@ -99,20 +119,23 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);min-height:100vh;color:
     </div>
   </div>
 
+  <!-- MAP -->
   <div class="card hidden" id="mapCard">
     <div class="card-title">🗺️ خريطة المسارات</div>
     <div id="map"></div>
-    <div class="map-hint">اضغط على مسار في الخريطة أو اختره من القائمة أدناه</div>
+    <div class="map-hint">اضغط على مسار أو اختره من القائمة أدناه</div>
   </div>
 
+  <!-- ROUTE LIST -->
   <div class="card hidden" id="routesCard">
     <div class="card-title">🚌 اختر الخط</div>
     <div class="routes-grid" id="routesGrid">
-      <div class="empty"><div class="e">⏳</div>جاري تحميل الخطوط...</div>
+      <div class="empty"><div class="empty-e">⏳</div>جاري تحميل الخطوط...</div>
     </div>
   </div>
 
-  <div class="card buses-section" id="busesCard">
+  <!-- BUSES -->
+  <div class="card hidden" id="busesCard">
     <div class="refresh-row">
       <div class="card-title" style="margin-bottom:0" id="busesTitle">🚌 الحافلات الفعالة</div>
       <button class="refresh-btn" onclick="loadBuses()">🔄 تحديث</button>
@@ -125,18 +148,20 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);min-height:100vh;color:
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-const SB_URL='https://ezmvwhpmvuokrrvsohuv.supabase.co';
-const SB_KEY='sb_publishable_tfN63FododffKy9jdqa8Tw_zD5GTnzY';
-const COLORS=['#1E88E5','#E53935','#43A047','#FB8C00','#8E24AA','#00ACC1','#F4511E','#3949AB','#00897B','#D81B60'];
+const SB_URL = 'https://ezmvwhpmvuokrrvsohuv.supabase.co';
+const SB_KEY = 'sb_publishable_tfN63FododffKy9jdqa8Tw_zD5GTnzY';
+const COLORS = ['#1E88E5','#E53935','#43A047','#FB8C00','#8E24AA','#00ACC1','#F4511E','#3949AB','#00897B','#D81B60'];
 
-let userLat=null,userLng=null;
-let map=null,userMarker=null;
+let userLat=null, userLng=null;
+let map=null, userMarker=null;
 let busMarkers=[];
-let routePolylines={};
-let selectedRouteId=null,selectedRouteName='',selectedColor='#1E88E5';
-let allRoutes=[];
+let routePolylines={};   // key = route_name
+let selectedRouteName=null;
+let selectedColor='#1E88E5';
 let busInterval=null;
+let routeColorMap={};    // route_name → color
 
+/* ─── UTILS ─── */
 function sbGet(table,params=''){
   return fetch(`${SB_URL}/rest/v1/${table}${params}`,
     {headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY}}).then(r=>r.json());
@@ -150,6 +175,7 @@ function fmtDist(m){return m<1000?Math.round(m)+'م':(m/1000).toFixed(1)+'كم';
 function escH(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function nowTime(){return new Date().toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'});}
 
+/* ─── STEP 1: LOCATION ─── */
 function getLocation(){
   const row=document.getElementById('locRow');
   const lt=document.getElementById('locText');
@@ -157,10 +183,12 @@ function getLocation(){
   row.className='loc-row loading';
   lt.textContent='جاري تحديد موقعك...';
   la.innerHTML='<span class="spinner"></span>';
-  if(!navigator.geolocation){row.className='loc-row err';lt.textContent='المتصفح لا يدعم GPS';la.textContent='❌';return;}
+  if(!navigator.geolocation){
+    row.className='loc-row err';lt.textContent='المتصفح لا يدعم GPS';la.textContent='❌';return;
+  }
   navigator.geolocation.getCurrentPosition(
     pos=>{
-      userLat=pos.coords.latitude;userLng=pos.coords.longitude;
+      userLat=pos.coords.latitude; userLng=pos.coords.longitude;
       row.className='loc-row ok';
       lt.textContent='تم تحديد موقعك ✅';
       document.getElementById('locSub').textContent=userLat.toFixed(5)+' , '+userLng.toFixed(5);
@@ -172,108 +200,169 @@ function getLocation(){
   );
 }
 
+/* ─── INIT MAP ─── */
 function initMap(){
   document.getElementById('mapCard').classList.remove('hidden');
   document.getElementById('routesCard').classList.remove('hidden');
+
   if(!map){
     map=L.map('map',{zoomControl:true,attributionControl:false}).setView([userLat,userLng],14);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(map);
   }
-  if(userMarker)userMarker.remove();
-  const userIcon=L.divIcon({
+
+  if(userMarker) userMarker.remove();
+  const uIcon=L.divIcon({
     className:'',
-    html:`<div style="width:18px;height:18px;background:#1565C0;border:3px solid #fff;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,.4)"></div>`,
-    iconSize:[18,18],iconAnchor:[9,9]
+    html:`<div style="width:16px;height:16px;background:#1565C0;border:3px solid #fff;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,.4)"></div>`,
+    iconSize:[16,16],iconAnchor:[8,8]
   });
-  userMarker=L.marker([userLat,userLng],{icon:userIcon}).addTo(map).bindPopup('📍 موقعك الحالي');
+  userMarker=L.marker([userLat,userLng],{icon:uIcon,zIndexOffset:1000})
+    .addTo(map).bindPopup('📍 موقعك الحالي');
+
   loadRoutes();
 }
 
+/* ─── LOAD ROUTES FROM DB ─── */
 async function loadRoutes(){
-  document.getElementById('routesGrid').innerHTML='<div class="empty"><div class="e">⏳</div>جاري تحميل الخطوط...</div>';
+  document.getElementById('routesGrid').innerHTML=
+    '<div class="empty"><div class="empty-e">⏳</div>جاري تحميل الخطوط...</div>';
   try{
-    const routes=await sbGet('routes','?select=id,name,route_stops(order,stops(id,name,lat,lng))&order=name');
-    if(!Array.isArray(routes)||routes.length===0){
-      document.getElementById('routesGrid').innerHTML='<div class="empty"><div class="e">🚫</div>لا توجد خطوط محفوظة</div>';
+    // جلب كل المسارات (الذهاب والعودة)
+    const rows = await sbGet('routes','?select=id,route_name,direction,points,city&order=route_name');
+
+    if(!Array.isArray(rows)||rows.length===0){
+      document.getElementById('routesGrid').innerHTML=
+        '<div class="empty"><div class="empty-e">🚫</div>لا توجد خطوط محفوظة</div>';
       return;
     }
-    allRoutes=routes;
-    Object.values(routePolylines).forEach(o=>{o.poly&&o.poly.remove();o.labels&&o.labels.forEach(l=>l.remove());o.dots&&o.dots.forEach(d=>d.remove());});
-    routePolylines={};
-    const bounds=[];
 
-    routes.forEach((route,idx)=>{
-      const color=COLORS[idx%COLORS.length];
-      const stops=(route.route_stops||[]).sort((a,b)=>a.order-b.order).map(rs=>rs.stops).filter(Boolean);
-      if(stops.length<2)return;
-      const latlngs=stops.map(s=>[parseFloat(s.lat),parseFloat(s.lng)]);
-      latlngs.forEach(p=>bounds.push(p));
-
-      const poly=L.polyline(latlngs,{color,weight:5,opacity:.7}).addTo(map);
-      poly.on('click',()=>selectRoute(route.id,route.name,color));
-
-      const mid=latlngs[Math.floor(latlngs.length/2)];
-      const labelIcon=L.divIcon({
-        className:'',
-        html:`<div style="background:${color};color:#fff;font-family:Cairo,sans-serif;font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;white-space:nowrap;box-shadow:0 1px 5px rgba(0,0,0,.3)">${escH(route.name)}</div>`,
-        iconAnchor:[30,10]
-      });
-      const lbl=L.marker(mid,{icon:labelIcon,interactive:false}).addTo(map);
-
-      const dots=stops.map((s,si)=>{
-        const isEnd=si===0||si===stops.length-1;
-        const dot=L.circleMarker([parseFloat(s.lat),parseFloat(s.lng)],{
-          radius:isEnd?7:4,color:'#fff',weight:2,fillColor:color,fillOpacity:1
-        }).addTo(map).bindPopup(`<b>${escH(s.name)}</b>`);
-        dot.on('click',e=>{e.stopPropagation();});
-        return dot;
-      });
-
-      routePolylines[route.id]={poly,labels:[lbl],dots,color};
+    // تجميع المسارات حسب route_name
+    const grouped={};
+    rows.forEach(r=>{
+      if(!grouped[r.route_name]) grouped[r.route_name]=[];
+      grouped[r.route_name].push(r);
     });
 
-    if(bounds.length)map.fitBounds(bounds,{padding:[30,30]});
-    renderRouteList(routes);
+    // تنظيف الخريطة
+    Object.values(routePolylines).forEach(arr=>arr.forEach(l=>l&&l.remove&&l.remove()));
+    routePolylines={};
+
+    const bounds=[];
+    const routeNames=Object.keys(grouped);
+
+    routeNames.forEach((rName,idx)=>{
+      const color=COLORS[idx%COLORS.length];
+      routeColorMap[rName]=color;
+      routePolylines[rName]=[];
+
+      grouped[rName].forEach(seg=>{
+        const pts=seg.points||[];
+        if(pts.length<2) return;
+        const latlngs=pts.map(p=>[parseFloat(p.lat),parseFloat(p.lng)]);
+        latlngs.forEach(p=>bounds.push(p));
+
+        const isDash=seg.direction==='returning';
+        const poly=L.polyline(latlngs,{
+          color, weight:5, opacity:.75,
+          dashArray: isDash?'10,8':null
+        }).addTo(map);
+        poly.on('click',()=>selectRoute(rName,color));
+        routePolylines[rName].push(poly);
+
+        // نقطة البداية
+        const first=latlngs[0];
+        const startDot=L.circleMarker(first,{radius:7,color:'#fff',weight:2,fillColor:color,fillOpacity:1})
+          .addTo(map).bindPopup(`<b style="font-family:Cairo">${escH(rName)}</b><br>${seg.direction==='going'?'بداية الذهاب':'بداية العودة'}`);
+        routePolylines[rName].push(startDot);
+
+        // نقطة النهاية
+        const last=latlngs[latlngs.length-1];
+        const endDot=L.circleMarker(last,{radius:7,color:'#fff',weight:2,fillColor:color,fillOpacity:1})
+          .addTo(map).bindPopup(`<b style="font-family:Cairo">${escH(rName)}</b><br>${seg.direction==='going'?'نهاية الذهاب':'نهاية العودة'}`);
+        routePolylines[rName].push(endDot);
+      });
+
+      // تسمية الخط في منتصف أول مسار
+      const firstSeg=grouped[rName].find(s=>s.direction==='going')||grouped[rName][0];
+      const pts=firstSeg.points||[];
+      if(pts.length>0){
+        const mid=pts[Math.floor(pts.length/2)];
+        const lbl=L.divIcon({
+          className:'',
+          html:`<div style="background:${color};color:#fff;font-family:Cairo,sans-serif;font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;white-space:nowrap;box-shadow:0 1px 5px rgba(0,0,0,.3)">${escH(rName)}</div>`,
+          iconAnchor:[30,10]
+        });
+        const lblMarker=L.marker([parseFloat(mid.lat),parseFloat(mid.lng)],{icon:lbl,interactive:false}).addTo(map);
+        routePolylines[rName].push(lblMarker);
+      }
+    });
+
+    if(bounds.length) map.fitBounds(bounds,{padding:[30,30]});
+    renderRouteList(grouped);
+
   }catch(e){
-    document.getElementById('routesGrid').innerHTML='<div class="empty"><div class="e">❌</div>خطأ في تحميل الخطوط</div>';
+    console.error(e);
+    document.getElementById('routesGrid').innerHTML=
+      '<div class="empty"><div class="empty-e">❌</div>خطأ في تحميل الخطوط: '+escH(e.message)+'</div>';
   }
 }
 
-function renderRouteList(routes){
+/* ─── RENDER ROUTE LIST ─── */
+function renderRouteList(grouped){
   const grid=document.getElementById('routesGrid');
-  grid.innerHTML=routes.map((route,idx)=>{
-    const color=COLORS[idx%COLORS.length];
-    const stopsCount=(route.route_stops||[]).length;
-    const isActive=selectedRouteId===route.id;
-    return `<button class="route-btn${isActive?' active':''}" id="rbtn-${route.id}" onclick="selectRoute(${route.id},'${escH(route.name)}','${color}')">
-      <div class="route-color" style="background:${color}"></div>
+  const names=Object.keys(grouped);
+  if(names.length===0){
+    grid.innerHTML='<div class="empty"><div class="empty-e">🚫</div>لا توجد خطوط</div>';
+    return;
+  }
+  grid.innerHTML=names.map(rName=>{
+    const color=routeColorMap[rName]||'#1E88E5';
+    const segs=grouped[rName];
+    const hasGoing=segs.some(s=>s.direction==='going');
+    const hasReturn=segs.some(s=>s.direction==='returning');
+    const isActive=selectedRouteName===rName;
+    return `<button class="route-btn${isActive?' active':''}" id="rbtn-${CSS.escape(rName)}" onclick="selectRoute('${escH(rName).replace(/'/g,"\\'")}','${color}')">
+      <div class="route-dot" style="background:${color}"></div>
       <div class="route-btn-info">
-        <div class="route-btn-name">${escH(route.name)}</div>
-        <div class="route-btn-meta">${stopsCount} محطة</div>
+        <div class="route-btn-name">${escH(rName)}</div>
+        <div class="route-btn-meta">
+          ${hasGoing?'<span class="direction-tab dir-go">ذهاب</span>':''}
+          ${hasReturn?'<span class="direction-tab dir-back">عودة</span>':''}
+        </div>
       </div>
-      <div class="route-badge ${isActive?'rb-active':'rb-idle'}" id="rbadge-${route.id}">${isActive?'✅ محدد':'اختر'}</div>
+      <div class="route-badge ${isActive?'rb-active':'rb-idle'}" id="rbadge-${CSS.escape(rName)}">${isActive?'✅ محدد':'اختر'}</div>
     </button>`;
   }).join('');
 }
 
-function selectRoute(id,name,color){
-  selectedRouteId=id;selectedRouteName=name;selectedColor=color;
+/* ─── SELECT ROUTE ─── */
+function selectRoute(rName,color){
+  selectedRouteName=rName;
+  selectedColor=color||routeColorMap[rName]||'#1E88E5';
 
-  Object.entries(routePolylines).forEach(([rid,o])=>{
-    if(parseInt(rid)===id){o.poly.setStyle({weight:7,opacity:1});}
-    else{o.poly.setStyle({weight:4,opacity:.25});}
+  // تبرز الخط المختار وتخفف الباقين
+  Object.entries(routePolylines).forEach(([name,layers])=>{
+    layers.forEach(l=>{
+      if(!l||!l.setStyle) return;
+      if(name===rName) l.setStyle({weight:7,opacity:1});
+      else l.setStyle({weight:3,opacity:.2});
+    });
   });
 
+  // تحديث الأزرار
   document.querySelectorAll('.route-btn').forEach(el=>el.classList.remove('active'));
   document.querySelectorAll('.route-badge').forEach(el=>{el.className='route-badge rb-idle';el.textContent='اختر';});
-  const btn=document.getElementById('rbtn-'+id);
-  if(btn)btn.classList.add('active');
-  const badge=document.getElementById('rbadge-'+id);
-  if(badge){badge.className='route-badge rb-active';badge.textContent='✅ محدد';}
+  try{
+    const btn=document.getElementById('rbtn-'+CSS.escape(rName));
+    if(btn) btn.classList.add('active');
+    const badge=document.getElementById('rbadge-'+CSS.escape(rName));
+    if(badge){badge.className='route-badge rb-active';badge.textContent='✅ محدد';}
+  }catch(e){}
 
+  // تحديث عنوان الحافلات
   document.getElementById('busesTitle').innerHTML=
-    `🚌 الحافلات الفعالة &mdash; <span style="color:${color};font-weight:700">${escH(name)}</span>`;
-  document.getElementById('busesCard').style.display='block';
+    `🚌 الحافلات الفعالة &mdash; <span style="color:${selectedColor};font-weight:700">${escH(rName)}</span>`;
+  document.getElementById('busesCard').classList.remove('hidden');
 
   clearInterval(busInterval);
   loadBuses();
@@ -282,11 +371,13 @@ function selectRoute(id,name,color){
   setTimeout(()=>document.getElementById('busesCard').scrollIntoView({behavior:'smooth'}),300);
 }
 
+/* ─── LOAD LIVE BUSES ─── */
 async function loadBuses(){
-  if(!selectedRouteName)return;
+  if(!selectedRouteName) return;
   const list=document.getElementById('busesList');
-  list.innerHTML='<div class="empty"><div class="e">⏳</div>جاري التحميل...</div>';
+  list.innerHTML='<div class="empty"><div class="empty-e">⏳</div>جاري التحميل...</div>';
 
+  // مسح ماركرات الحافلات القديمة
   busMarkers.forEach(m=>m.remove());
   busMarkers=[];
 
@@ -297,44 +388,55 @@ async function loadBuses(){
     document.getElementById('updateTime').textContent='آخر تحديث: '+nowTime();
 
     if(!Array.isArray(buses)||buses.length===0){
-      list.innerHTML='<div class="empty"><div class="e">😴</div>لا توجد حافلات فعالة على هذا الخط الآن</div>';
+      list.innerHTML='<div class="empty"><div class="empty-e">😴</div>لا توجد حافلات فعالة على هذا الخط الآن</div>';
       return;
     }
 
+    // رسم الحافلات على الخريطة
     buses.forEach(b=>{
-      if(!b.lat||!b.lng)return;
-      const busIcon=L.divIcon({
+      if(!b.lat||!b.lng) return;
+      const bIcon=L.divIcon({
         className:'',
-        html:`<div style="background:${selectedColor};color:#fff;font-size:16px;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.35);border:2px solid #fff">🚌</div>`,
+        html:`<div style="background:${selectedColor};color:#fff;font-size:15px;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.35);border:2px solid #fff">🚌</div>`,
         iconSize:[30,30],iconAnchor:[15,15]
       });
-      const m=L.marker([parseFloat(b.lat),parseFloat(b.lng)],{icon:busIcon})
+      const m=L.marker([parseFloat(b.lat),parseFloat(b.lng)],{icon:bIcon,zIndexOffset:500})
         .addTo(map)
-        .bindPopup(`<b style="font-family:Cairo">${escH(b.driver_name)}</b><br>${escH(b.route_name)}${b.status?'<br>'+escH(b.status):''}`);
+        .bindPopup(`<div style="font-family:Cairo;min-width:140px">
+          <b>${escH(b.driver_name)}</b><br>
+          <span style="color:#607D8B;font-size:12px">الخط: ${escH(b.route_name)}</span><br>
+          ${b.status?'<span style="font-size:12px">الحالة: '+escH(b.status)+'</span>':''}
+        </div>`);
       busMarkers.push(m);
     });
 
+    // رسم قائمة الحافلات
     list.innerHTML=buses.map(b=>{
       const dist=(userLat&&b.lat)?calcDist(userLat,userLng,parseFloat(b.lat),parseFloat(b.lng)):null;
       const statusLow=(b.status||'').toLowerCase();
-      const isMoving=statusLow.includes('متحرك')||statusLow.includes('moving')||statusLow.includes('activ')||statusLow.includes('active');
+      const isOn=statusLow.includes('متحرك')||statusLow.includes('moving')||
+                 statusLow.includes('active')||statusLow.includes('activ')||
+                 statusLow.includes('on')||statusLow===''||!b.status;
       const mins=dist?Math.max(1,Math.round(dist/300)):null;
       return `<div class="bus-row">
         <div class="bus-icon">🚌</div>
         <div class="bus-body">
           <div class="bus-name">${escH(b.driver_name)}</div>
-          <div class="bus-meta">الخط: <b>${escH(b.route_name)}</b>${b.status?' · '+escH(b.status):''}</div>
+          <div class="bus-meta">
+            الخط: <b>${escH(b.route_name)}</b>
+            ${b.status?' · '+escH(b.status):''}
+          </div>
         </div>
-        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
-          <div class="bus-status ${isMoving?'bs-moving':'bs-stop'}">${isMoving?'🟢 متحرك':'🟡 واقف'}</div>
+        <div class="bus-right">
+          <div class="bus-status ${isOn?'bs-on':'bs-off'}">${isOn?'🟢 متحرك':'🟡 واقف'}</div>
           ${dist!==null?`<div class="bus-dist">${fmtDist(dist)}</div>`:''}
-          ${mins?`<div style="font-size:11px;color:var(--muted)">~${mins} د</div>`:''}
+          ${mins?`<div class="bus-eta">~${mins} دقيقة</div>`:''}
         </div>
       </div>`;
     }).join('');
 
   }catch(e){
-    list.innerHTML='<div class="empty"><div class="e">❌</div>خطأ في الاتصال</div>';
+    list.innerHTML='<div class="empty"><div class="empty-e">❌</div>خطأ في الاتصال</div>';
   }
 }
 </script>
