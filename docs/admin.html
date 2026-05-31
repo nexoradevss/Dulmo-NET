@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dolmuş NET — Super Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#1565C0;--blue-mid:#1E88E5;--blue-light:#E3F2FD;
+  --green:#2E7D32;--green-light:#E8F5E9;
+  --red:#C62828;--red-light:#FFEBEE;
+  --amber:#E65100;--amber-light:#FFF3E0;
+  --bg:#F0F4F8;--card:#fff;--border:#CFD8DC;
+  --text:#1A2332;--muted:#607D8B;
+  --sidebar:220px;
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Cairo',sans-serif}
+body{background:var(--bg);color:var(--text);min-height:100vh;display:flex}
+
+/* ── Login ── */
+.login-wrap{flex:1;display:flex;align-items:center;justify-content:center}
+.login-box{background:var(--card);border-radius:16px;padding:40px 32px;width:100%;max-width:380px;box-shadow:0 4px 24px rgba(21,101,192,.12)}
+.login-logo{font-size:40px;text-align:center;margin-bottom:8px}
+.login-title{font-size:20px;font-weight:800;color:var(--blue);text-align:center;margin-bottom:4px}
+.login-sub{font-size:13px;color:var(--muted);text-align:center;margin-bottom:28px}
+.inp{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:'Cairo',sans-serif;margin-bottom:12px;color:var(--text);background:#fff}
+.inp:focus{outline:none;border-color:var(--blue-mid)}
+.btn-login{width:100%;padding:14px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Cairo',sans-serif}
+.login-err{color:var(--red);font-size:13px;text-align:center;margin-top:8px}
+
+/* ── Layout ── */
+.sidebar{width:var(--sidebar);background:var(--blue);min-height:100vh;display:flex;flex-direction:column;position:fixed;right:0;top:0;z-index:100}
+.sidebar-logo{padding:20px 16px;border-bottom:1px solid rgba(255,255,255,.15)}
+.sidebar-logo h2{color:#fff;font-size:16px;font-weight:800}
+.sidebar-logo p{color:rgba(255,255,255,.6);font-size:11px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:12px 16px;color:rgba(255,255,255,.7);cursor:pointer;transition:.2s;font-size:14px;font-weight:600;border-right:3px solid transparent}
+.nav-item:hover{background:rgba(255,255,255,.1);color:#fff}
+.nav-item.active{background:rgba(255,255,255,.15);color:#fff;border-right-color:#fff}
+.nav-icon{font-size:18px;flex-shrink:0}
+.sidebar-footer{margin-top:auto;padding:16px;border-top:1px solid rgba(255,255,255,.15)}
+.btn-logout{width:100%;padding:10px;background:rgba(255,255,255,.1);color:#fff;border:1.5px solid rgba(255,255,255,.3);border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Cairo',sans-serif}
+
+.main{margin-right:var(--sidebar);flex:1;padding:24px;min-height:100vh}
+.page{display:none}
+.page.active{display:block}
+.page-title{font-size:20px;font-weight:800;color:var(--text);margin-bottom:20px;display:flex;align-items:center;gap:8px}
+
+/* ── Stats Cards ── */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:20px}
+.stat-card{background:var(--card);border-radius:14px;padding:16px 18px;border:1px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.stat-icon{font-size:28px;margin-bottom:8px}
+.stat-value{font-size:26px;font-weight:800;color:var(--blue)}
+.stat-label{font-size:12px;color:var(--muted);margin-top:2px}
+
+/* ── Table ── */
+.card{background:var(--card);border-radius:14px;padding:16px;border:1px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,.05);margin-bottom:16px}
+.card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.card-title{font-size:14px;font-weight:700;color:var(--text)}
+.btn-sm{padding:6px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;border:none;font-family:'Cairo',sans-serif}
+.btn-primary{background:var(--blue);color:#fff}
+.btn-danger{background:var(--red);color:#fff}
+.btn-success{background:var(--green);color:#fff}
+.btn-ghost{background:var(--bg);color:var(--muted);border:1.5px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:right;padding:10px 12px;background:var(--bg);color:var(--muted);font-weight:700;font-size:12px;border-bottom:1px solid var(--border)}
+td{padding:10px 12px;border-bottom:1px solid var(--border);color:var(--text)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#F8FAFC}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700}
+.badge-on{background:var(--green-light);color:var(--green)}
+.badge-off{background:var(--amber-light);color:var(--amber)}
+.badge-blue{background:var(--blue-light);color:var(--blue)}
+
+/* ── Map ── */
+#adminMap{height:480px;border-radius:12px;border:1.5px solid var(--border)}
+
+/* ── Broadcast ── */
+.broadcast-box{background:var(--card);border-radius:14px;padding:20px;border:1px solid var(--border)}
+textarea{width:100%;padding:12px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:'Cairo',sans-serif;resize:vertical;min-height:100px;color:var(--text)}
+textarea:focus{outline:none;border-color:var(--blue-mid)}
+
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
+.empty{text-align:center;padding:24px;color:var(--muted);font-size:13px}
+.refresh-info{font-size:11px;color:var(--muted);margin-bottom:12px}
+</style>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-wrap" id="loginWrap">
+  <div class="login-box">
+    <div class="login-logo">🚌</div>
+    <div class="login-title">Dolmuş NET</div>
+    <div class="login-sub">لوحة Super Admin</div>
+    <input class="inp" type="text" id="adminUser" placeholder="اسم المستخدم" />
+    <input class="inp" type="password" id="adminPass" placeholder="كلمة المرور" onkeydown="if(event.key==='Enter')doLogin()" />
+    <button class="btn-login" onclick="doLogin()">دخول</button>
+    <div class="login-err hidden" id="loginErr">بيانات خاطئة</div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard" style="display:none;width:100%;display:none">
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <h2>🚌 Dolmuş NET</h2>
+      <p>Super Admin</p>
+    </div>
+    <div class="nav-item active" onclick="showPage('overview')">
+      <span class="nav-icon">📊</span> نظرة عامة
+    </div>
+    <div class="nav-item" onclick="showPage('map')">
+      <span class="nav-icon">🗺️</span> الخريطة المباشرة
+    </div>
+    <div class="nav-item" onclick="showPage('drivers')">
+      <span class="nav-icon">🚗</span> السائقون
+    </div>
+    <div class="nav-item" onclick="showPage('routes')">
+      <span class="nav-icon">📍</span> الخطوط
+    </div>
+    <div class="nav-item" onclick="showPage('passengers')">
+      <span class="nav-icon">🧍</span> الركاب
+    </div>
+    <div class="nav-item" onclick="showPage('broadcast')">
+      <span class="nav-icon">📢</span> إشعار جماعي
+    </div>
+    <div class="sidebar-footer">
+      <button class="btn-logout" onclick="doLogout()">🚪 تسجيل الخروج</button>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div class="main">
+
+    <!-- Overview -->
+    <div class="page active" id="page-overview">
+      <div class="page-title">📊 نظرة عامة</div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">🚌</div>
+          <div class="stat-value" id="stat-active">—</div>
+          <div class="stat-label">حافلات فعالة الآن</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🚗</div>
+          <div class="stat-value" id="stat-drivers">—</div>
+          <div class="stat-label">إجمالي السائقين</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📍</div>
+          <div class="stat-value" id="stat-routes">—</div>
+          <div class="stat-label">الخطوط المسجلة</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🧍</div>
+          <div class="stat-value" id="stat-passengers">—</div>
+          <div class="stat-label">ركاب متصلون الآن</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">🚌 الحافلات الفعالة الآن</div>
+          <button class="btn-sm btn-ghost" onclick="loadOverview()">🔄 تحديث</button>
+        </div>
+        <div class="refresh-info" id="overviewTime"></div>
+        <div id="activeBusesList"><div class="empty">جاري التحميل...</div></div>
+      </div>
+    </div>
+
+    <!-- Map -->
+    <div class="page" id="page-map">
+      <div class="page-title">🗺️ الخريطة المباشرة</div>
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">جميع الحافلات على الخريطة</div>
+          <button class="btn-sm btn-ghost" onclick="loadAdminMap()">🔄 تحديث</button>
+        </div>
+        <div id="adminMap"></div>
+      </div>
+    </div>
+
+    <!-- Drivers -->
+    <div class="page" id="page-drivers">
+      <div class="page-title">🚗 إدارة السائقين</div>
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">قائمة السائقين</div>
+          <button class="btn-sm btn-ghost" onclick="loadDrivers()">🔄 تحديث</button>
+        </div>
+        <div id="driversList"><div class="empty">جاري التحميل...</div></div>
+      </div>
+    </div>
+
+    <!-- Routes -->
+    <div class="page" id="page-routes">
+      <div class="page-title">📍 إدارة الخطوط</div>
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">الخطوط المسجلة</div>
+          <button class="btn-sm btn-ghost" onclick="loadRoutes()">🔄 تحديث</button>
+        </div>
+        <div id="routesList"><div class="empty">جاري التحميل...</div></div>
+      </div>
+    </div>
+
+    <!-- Passengers -->
+    <div class="page" id="page-passengers">
+      <div class="page-title">🧍 الركاب المتصلون</div>
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">الركاب الفعالون الآن</div>
+          <button class="btn-sm btn-ghost" onclick="loadPassengers()">🔄 تحديث</button>
+        </div>
+        <div id="passengersList"><div class="empty">جاري التحميل...</div></div>
+      </div>
+    </div>
+
+    <!-- Broadcast -->
+    <div class="page" id="page-broadcast">
+      <div class="page-title">📢 إشعار جماعي</div>
+      <div class="broadcast-box">
+        <p style="font-size:13px;color:var(--muted);margin-bottom:12px">أرسل رسالة لجميع السائقين</p>
+        <textarea id="broadcastMsg" placeholder="اكتب رسالتك هنا..."></textarea>
+        <div style="margin-top:12px;display:flex;gap:10px">
+          <button class="btn-sm btn-primary" onclick="sendBroadcast()">📤 إرسال للكل</button>
+          <button class="btn-sm btn-ghost" onclick="document.getElementById('broadcastMsg').value=''">مسح</button>
+        </div>
+        <div id="broadcastResult" style="margin-top:12px;font-size:13px"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const SB_URL = 'https://ezmvwhpmvuokrrvsohuv.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV6bXZ3aHBtdnVva3JydnNvaHV2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTcxNDQsImV4cCI6MjA5NDI3MzE0NH0.je77PXmfbjR9H7TWzVhpQ4Kt6mTRiI0UfS9pHQzpHhU';
+const ADMIN_USER = 'admin';
+const ADMIN_PASS = 'dolmus2026';
+
+let adminMap = null;
+let mapMarkers = [];
+let autoRefresh = null;
+
+function escH(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function nowTime(){return new Date().toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'});}
+
+async function sbGet(table, params=''){
+  const r = await fetch(`${SB_URL}/rest/v1/${table}${params}`,
+    {headers:{apikey:SB_KEY, Authorization:'Bearer '+SB_KEY}});
+  return r.json();
+}
+
+async function sbDelete(table, params){
+  return fetch(`${SB_URL}/rest/v1/${table}${params}`,{
+    method:'DELETE',
+    headers:{apikey:SB_KEY, Authorization:'Bearer '+SB_KEY}
+  });
+}
+
+// ── Login ──
+function doLogin(){
+  const u = document.getElementById('adminUser').value.trim();
+  const p = document.getElementById('adminPass').value.trim();
+  if(u === ADMIN_USER && p === ADMIN_PASS){
+    document.getElementById('loginWrap').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'flex';
+    initDashboard();
+  } else {
+    document.getElementById('loginErr').classList.remove('hidden');
+  }
+}
+
+function doLogout(){
+  clearInterval(autoRefresh);
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('loginWrap').style.display = 'flex';
+  document.getElementById('adminUser').value = '';
+  document.getElementById('adminPass').value = '';
+}
+
+// ── Navigation ──
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  event.currentTarget.classList.add('active');
+  if(name==='overview') loadOverview();
+  if(name==='map') loadAdminMap();
+  if(name==='drivers') loadDrivers();
+  if(name==='routes') loadRoutes();
+  if(name==='passengers') loadPassengers();
+}
+
+function initDashboard(){
+  loadOverview();
+  autoRefresh = setInterval(()=>{
+    const active = document.querySelector('.page.active');
+    if(active && active.id === 'page-overview') loadOverview();
+    if(active && active.id === 'page-map') loadAdminMap();
+  }, 15000);
+}
+
+// ── Overview ──
+async function loadOverview(){
+  try{
+    const [buses, drivers, routes, passengers] = await Promise.all([
+      sbGet('live_locations','?select=driver_name,route_name,lat,lng'),
+      sbGet('drivers','?select=id,name,route_name,is_active'),
+      sbGet('routes','?select=id,route_name&order=route_name'),
+      sbGet('passenger_locations','?select=id,route_name,lat,lng'),
+    ]);
+    document.getElementById('stat-active').textContent = Array.isArray(buses) ? buses.length : 0;
+    document.getElementById('stat-drivers').textContent = Array.isArray(drivers) ? drivers.length : 0;
+    const uniqueRoutes = Array.isArray(routes) ? [...new Set(routes.map(r=>r.route_name))].length : 0;
+    document.getElementById('stat-routes').textContent = uniqueRoutes;
+    document.getElementById('stat-passengers').textContent = Array.isArray(passengers) ? passengers.length : 0;
+    document.getElementById('overviewTime').textContent = 'آخر تحديث: ' + nowTime();
+    const list = document.getElementById('activeBusesList');
+    if(!Array.isArray(buses) || buses.length === 0){
+      list.innerHTML = '<div class="empty">لا توجد حافلات فعالة الآن</div>';
+      return;
+    }
+    list.innerHTML = `<table>
+      <thead><tr><th>السائق</th><th>الخط</th><th>الموقع</th><th>الحالة</th></tr></thead>
+      <tbody>${buses.map(b=>`<tr>
+        <td><b>${escH(b.driver_name)}</b></td>
+        <td>${escH(b.route_name)}</td>
+        <td style="font-size:11px;color:var(--muted)">${parseFloat(b.lat).toFixed(4)}, ${parseFloat(b.lng).toFixed(4)}</td>
+        <td><span class="badge badge-on">🟢 فعال</span></td>
+      </tr>`).join('')}</tbody>
+    </table>`;
+  }catch(e){
+    document.getElementById('activeBusesList').innerHTML = '<div class="empty">❌ خطأ في التحميل</div>';
+  }
+}
+
+// ── Admin Map ──
+async function loadAdminMap(){
+  if(!adminMap){
+    adminMap = L.map('adminMap',{zoomControl:true,attributionControl:false}).setView([36.72,37.12],12);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(adminMap);
+  }
+  mapMarkers.forEach(m=>m.remove());
+  mapMarkers = [];
+  try{
+    const buses = await sbGet('live_locations','?select=driver_name,route_name,lat,lng');
+    if(!Array.isArray(buses)) return;
+    buses.forEach(b=>{
+      const lat=parseFloat(b.lat), lng=parseFloat(b.lng);
+      if(isNaN(lat)||isNaN(lng)) return;
+      const icon = L.divIcon({
+        className:'',
+        html:`<div style="display:flex;flex-direction:column;align-items:center;gap:2px">
+          <div style="font-size:26px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.4))">🚌</div>
+          <div style="background:#1565C0;color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;white-space:nowrap">${escH(b.driver_name)}</div>
+        </div>`,
+        iconSize:[100,56],iconAnchor:[50,28]
+      });
+      const m = L.marker([lat,lng],{icon}).addTo(adminMap)
+        .bindPopup(`<b>${escH(b.driver_name)}</b><br>الخط: ${escH(b.route_name)}`);
+      mapMarkers.push(m);
+    });
+    if(mapMarkers.length > 0){
+      adminMap.fitBounds(L.featureGroup(mapMarkers).getBounds().pad(0.3));
+    }
+  }catch(e){ console.error(e); }
+}
+
+// ── Drivers ──
+async function loadDrivers(){
+  const el = document.getElementById('driversList');
+  el.innerHTML = '<div class="empty">جاري التحميل...</div>';
+  try{
+    const drivers = await sbGet('drivers','?select=id,name,route_name,is_active,created_at&order=created_at.desc');
+    if(!Array.isArray(drivers)||drivers.length===0){
+      el.innerHTML = '<div class="empty">لا يوجد سائقون مسجلون</div>';
+      return;
+    }
+    el.innerHTML = `<table>
+      <thead><tr><th>الاسم</th><th>الخط</th><th>الحالة</th><th>تاريخ التسجيل</th><th>إجراء</th></tr></thead>
+      <tbody>${drivers.map(d=>`<tr>
+        <td><b>${escH(d.name)}</b></td>
+        <td>${escH(d.route_name||'—')}</td>
+        <td><span class="badge ${d.is_active?'badge-on':'badge-off'}">${d.is_active?'🟢 فعال':'⚪ غير فعال'}</span></td>
+        <td style="font-size:11px;color:var(--muted)">${d.created_at?new Date(d.created_at).toLocaleDateString('ar-SA'):'—'}</td>
+        <td><button class="btn-sm btn-danger" onclick="deleteDriver('${escH(d.id)}')">🗑 حذف</button></td>
+      </tr>`).join('')}</tbody>
+    </table>`;
+  }catch(e){ el.innerHTML = '<div class="empty">❌ خطأ في التحميل</div>'; }
+}
+
+async function deleteDriver(id){
+  if(!confirm('هل أنت متأكد من حذف هذا السائق؟')) return;
+  await sbDelete('drivers',`?id=eq.${id}`);
+  loadDrivers();
+}
+
+// ── Routes ──
+async function loadRoutes(){
+  const el = document.getElementById('routesList');
+  el.innerHTML = '<div class="empty">جاري التحميل...</div>';
+  try{
+    const routes = await sbGet('routes','?select=id,route_name,direction,city&order=route_name');
+    if(!Array.isArray(routes)||routes.length===0){
+      el.innerHTML = '<div class="empty">لا توجد خطوط مسجلة</div>';
+      return;
+    }
+    el.innerHTML = `<table>
+      <thead><tr><th>اسم الخط</th><th>الاتجاه</th><th>المدينة</th><th>إجراء</th></tr></thead>
+      <tbody>${routes.map(r=>`<tr>
+        <td><b>${escH(r.route_name)}</b></td>
+        <td><span class="badge badge-blue">${r.direction==='going'?'ذهاب':'عودة'}</span></td>
+        <td>${escH(r.city||'—')}</td>
+        <td><button class="btn-sm btn-danger" onclick="deleteRoute('${escH(r.id)}')">🗑 حذف</button></td>
+      </tr>`).join('')}</tbody>
+    </table>`;
+  }catch(e){ el.innerHTML = '<div class="empty">❌ خطأ في التحميل</div>'; }
+}
+
+async function deleteRoute(id){
+  if(!confirm('هل أنت متأكد من حذف هذا الخط؟')) return;
+  await sbDelete('routes',`?id=eq.${id}`);
+  loadRoutes();
+}
+
+// ── Passengers ──
+async function loadPassengers(){
+  const el = document.getElementById('passengersList');
+  el.innerHTML = '<div class="empty">جاري التحميل...</div>';
+  try{
+    const passengers = await sbGet('passenger_locations','?select=id,route_name,lat,lng');
+    if(!Array.isArray(passengers)||passengers.length===0){
+      el.innerHTML = '<div class="empty">لا يوجد ركاب متصلون الآن</div>';
+      return;
+    }
+    el.innerHTML = `<table>
+      <thead><tr><th>المعرف</th><th>الخط المختار</th><th>الموقع</th></tr></thead>
+      <tbody>${passengers.map(p=>`<tr>
+        <td style="font-size:11px;color:var(--muted)">${escH(p.id)}</td>
+        <td>${escH(p.route_name||'—')}</td>
+        <td style="font-size:11px;color:var(--muted)">${parseFloat(p.lat).toFixed(4)}, ${parseFloat(p.lng).toFixed(4)}</td>
+      </tr>`).join('')}</tbody>
+    </table>`;
+  }catch(e){ el.innerHTML = '<div class="empty">❌ خطأ في التحميل</div>'; }
+}
+
+// ── Broadcast ──
+async function sendBroadcast(){
+  const msg = document.getElementById('broadcastMsg').value.trim();
+  const res = document.getElementById('broadcastResult');
+  if(!msg){ res.innerHTML='<span style="color:var(--red)">اكتب رسالة أولاً</span>'; return; }
+  try{
+    await fetch(`${SB_URL}/rest/v1/notifications`,{
+      method:'POST',
+      headers:{apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json'},
+      body: JSON.stringify({message:msg, type:'broadcast', created_at: new Date().toISOString()})
+    });
+    res.innerHTML = '<span style="color:var(--green)">✅ تم الإرسال بنجاح</span>';
+    document.getElementById('broadcastMsg').value = '';
+  }catch(e){
+    res.innerHTML = '<span style="color:var(--red)">❌ فشل الإرسال</span>';
+  }
+}
+</script>
+</body>
+</html>
