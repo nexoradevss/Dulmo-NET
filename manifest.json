@@ -1,0 +1,20 @@
+﻿{
+  "name": "Dolmuş NET",
+  "short_name": "DolmuşNET",
+  "start_url": "/Dulmo-NET/passenger.html",
+  "display": "standalone",
+  "background_color": "#1565C0",
+  "theme_color": "#1565C0",
+  "icons": [
+    {
+      "src": "https://raw.githubusercontent.com/mohamadyuonsos-beep/Dulmo-NET/main/ic_launcher.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://raw.githubusercontent.com/mohamadyuonsos-beep/Dulmo-NET/main/ic_launcher.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
