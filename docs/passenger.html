@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html id="htmlRoot" dir="ltr" lang="tr">
 <head>
 <meta charset="UTF-8">
@@ -124,6 +124,7 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);min-height:100vh;color:
 }
 .ios-hint.show{display:block}
 </style>
+<link rel="manifest" href="manifest.json">
 </head>
 <body>
 
@@ -515,6 +516,11 @@ async function loadBuses(){
 
 window.addEventListener('beforeunload',()=>{deletePassengerLocation();});
 window.addEventListener('load', initAppCard);
+</script>
+<script>
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('./sw.js');
+}
 </script>
 </body>
 </html>
