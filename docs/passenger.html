@@ -174,27 +174,23 @@ function setLang(l){
   const root = document.getElementById('htmlRoot');
   if(l==='ar'){ root.setAttribute('dir','rtl'); root.setAttribute('lang','ar'); }
   else { root.setAttribute('dir','ltr'); root.setAttribute('lang',l); }
-
   document.getElementById('locBtnTxt').textContent = T[l].locBtn;
   document.getElementById('cancelBtn').textContent = T[l].cancel;
   document.getElementById('mapTitle').textContent = T[l].mapTitle;
   document.getElementById('routeTitle').textContent = T[l].routeTitle;
   document.getElementById('refreshBtn').textContent = T[l].refresh;
   document.getElementById('updateTime').textContent = T[l].autoRefresh;
-
   const hdrBtn = document.getElementById('hdrLocBtn');
   if(hdrBtn.classList.contains('ok')) document.getElementById('locBtnTxt').textContent = T[l].locOk;
   else if(hdrBtn.classList.contains('err')) document.getElementById('locBtnTxt').textContent = T[l].locErr;
   else if(hdrBtn.classList.contains('loading')) document.getElementById('locBtnTxt').textContent = T[l].locating;
   else document.getElementById('locBtnTxt').textContent = T[l].locBtn;
-
   if(selectedRouteName){
     document.getElementById('busesTitle').innerHTML =
       T[l].busTitle + ' &mdash; <span style="color:'+selectedColor+';font-weight:700">'+escH(selectedRouteName)+'</span>';
   } else {
     document.getElementById('busesTitle').textContent = T[l].busTitle;
   }
-
   if(map) loadRoutes();
 }
 
@@ -234,6 +230,12 @@ function cancelSelection(){
   Object.values(routePolylines).forEach(arr=>arr.forEach(l=>{
     if(l&&l.setStyle) l.setStyle({weight:5,opacity:.75});
   }));
+  // ✅ إزالة marker الراكب وإعادة زر GPS
+  if(userMarker){ userMarker.remove(); userMarker=null; }
+  userLat=null; userLng=null;
+  const btn=document.getElementById('hdrLocBtn');
+  btn.className='hdr-loc-btn';
+  document.getElementById('locBtnTxt').textContent=T[lang].locBtn;
 }
 
 function getLocation(){
