@@ -202,6 +202,8 @@ let selectedRouteName=null;
 let selectedColor='#1E88E5';
 let busInterval=null;
 let routeColorMap={};
+// ✅ معرّف الراكب في قاعدة البيانات
+let passengerId = 'p_' + Math.random().toString(36).substr(2,9);
 
 function sbGet(table,params=''){
   return fetch(`${SB_URL}/rest/v1/${table}${params}`,
@@ -217,7 +219,41 @@ function escH(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')
 function nowTime(){return new Date().toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'});}
 function dbg(msg){ console.log(msg); }
 
-function cancelSelection(){
+// ✅ حفظ موقع الراكب في passenger_locations
+async function savePassengerLocation(lat, lng, routeName){
+  try{
+    await fetch(`${SB_URL}/rest/v1/passenger_locations`,{
+      method:'POST',
+      headers:{
+        apikey:SB_KEY,
+        Authorization:'Bearer '+SB_KEY,
+        'Content-Type':'application/json',
+        'Prefer':'resolution=merge-duplicates'
+      },
+      body: JSON.stringify({
+        id: passengerId,
+        route_name: routeName || '',
+        lat: lat,
+        lng: lng
+      })
+    });
+  }catch(e){ console.error('savePassengerLocation error:',e); }
+}
+
+// ✅ حذف موقع الراكب من passenger_locations
+async function deletePassengerLocation(){
+  try{
+    await fetch(`${SB_URL}/rest/v1/passenger_locations?id=eq.${passengerId}`,{
+      method:'DELETE',
+      headers:{apikey:SB_KEY, Authorization:'Bearer '+SB_KEY}
+    });
+  }catch(e){ console.error('deletePassengerLocation error:',e); }
+}
+
+async function cancelSelection(){
+  // ✅ حذف من Supabase أولاً
+  await deletePassengerLocation();
+
   selectedRouteName=null;
   clearInterval(busInterval);
   document.getElementById('busesCard').classList.add('hidden');
@@ -230,7 +266,6 @@ function cancelSelection(){
   Object.values(routePolylines).forEach(arr=>arr.forEach(l=>{
     if(l&&l.setStyle) l.setStyle({weight:5,opacity:.75});
   }));
-  // ✅ إزالة marker الراكب وإعادة زر GPS
   if(userMarker){ userMarker.remove(); userMarker=null; }
   userLat=null; userLng=null;
   const btn=document.getElementById('hdrLocBtn');
@@ -391,6 +426,12 @@ function selectRoute(rName,color){
     T[lang].busTitle+' &mdash; <span style="color:'+selectedColor+';font-weight:700">'+escH(rName)+'</span>';
   document.getElementById('busesCard').classList.remove('hidden');
   document.getElementById('cancelBtn').classList.add('show');
+
+  // ✅ حفظ موقع الراكب في Supabase عند اختيار الخط
+  if(userLat && userLng){
+    savePassengerLocation(userLat, userLng, rName);
+  }
+
   clearInterval(busInterval);
   loadBuses();
   busInterval=setInterval(loadBuses,10000);
@@ -467,6 +508,9 @@ async function loadBuses(){
     list.innerHTML='<div class="empty"><div class="empty-e">❌</div>'+T[lang].connErr+': '+escH(e.message)+'</div>';
   }
 }
+
+// ✅ حذف موقع الراكب عند إغلاق الصفحة
+window.addEventListener('beforeunload', ()=>{ deletePassengerLocation(); });
 </script>
 </body>
 </html>
