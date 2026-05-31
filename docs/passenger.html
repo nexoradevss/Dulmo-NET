@@ -114,7 +114,7 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);min-height:100vh;color:
       <div class="card-title" style="margin-bottom:0" id="busesTitle">🚌 الحافلات الفعالة</div>
       <button class="refresh-btn" onclick="loadBuses()">🔄 تحديث</button>
     </div>
-    <div class="update-time" id="updateTime"></div>
+    <div class="update-time" id="updateTime">🔄 تحديث تلقائي كل 10 ثوانٍ</div>
     <div id="busesList"></div>
   </div>
 
@@ -296,7 +296,6 @@ function selectRoute(rName,color){
   document.getElementById('busesTitle').innerHTML=
     `🚌 الحافلات الفعالة &mdash; <span style="color:${selectedColor};font-weight:700">${escH(rName)}</span>`;
   document.getElementById('busesCard').classList.remove('hidden');
-  document.getElementById('debugPanel').textContent='';
   clearInterval(busInterval);
   loadBuses();
   busInterval=setInterval(loadBuses,10000);
@@ -314,7 +313,7 @@ async function loadBuses(){
       `?select=driver_name,route_name,lat,lng&route_name=eq.${encodeURIComponent(selectedRouteName)}`);
     dbg('📡 الخط المحدد: '+selectedRouteName);
     dbg('📦 البيانات الخام: '+JSON.stringify(buses,null,2));
-    document.getElementById('updateTime').textContent='آخر تحديث: '+nowTime();
+    document.getElementById('updateTime').textContent='آخر تحديث: '+nowTime()+' 🔄 (كل 10 ث)';
     if(!Array.isArray(buses)||buses.length===0){
       dbg('⚠️ لا توجد سجلات في live_locations لهذا الخط');
       list.innerHTML='<div class="empty"><div class="empty-e">😴</div>لا توجد حافلات فعالة على هذا الخط الآن</div>';
