@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html dir="rtl" lang="ar">
+<html id="htmlRoot" dir="ltr" lang="tr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#1565C0">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>Dolmuş NET — الراكب</title>
+<title>Dolmuş NET</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
@@ -32,6 +32,10 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);min-height:100vh;color:
 .hdr-loc-btn.ok{background:#2E7D32}
 .hdr-loc-btn.loading{background:#E65100}
 .hdr-loc-btn.err{background:#C62828}
+.hdr-cancel-btn{background:rgba(255,255,255,0.2);color:#fff;border:1.5px solid rgba(255,255,255,0.5);border-radius:10px;padding:6px 12px;font-family:'Cairo',sans-serif;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;display:none}
+.hdr-cancel-btn.show{display:block}
+.lang-select{background:rgba(255,255,255,0.15);color:#fff;border:1.5px solid rgba(255,255,255,0.4);border-radius:8px;padding:4px 6px;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0;outline:none}
+.lang-select option{color:#1A2332;background:#fff}
 .wrap{max-width:520px;margin:-6px auto 0;padding:0 10px 30px}
 .card{background:var(--card);border-radius:var(--r);padding:10px 12px;margin-bottom:8px;box-shadow:var(--shadow);border:1px solid var(--border)}
 .card-title{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:5px}
@@ -89,9 +93,14 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);min-height:100vh;color:
   <div class="hdr-logo">🚌</div>
   <div class="hdr-title">
     <h1>Dolmuş NET</h1>
-    <p>تتبع الحافلات في الوقت الفعلي</p>
   </div>
-  <button class="hdr-loc-btn" id="hdrLocBtn" onclick="getLocation()">📍 تحديد موقعي</button>
+  <select class="lang-select" id="langSelect" onchange="setLang(this.value)">
+    <option value="tr" selected>🇹🇷 TR</option>
+    <option value="en">🇬🇧 EN</option>
+    <option value="ar">🇸🇦 AR</option>
+  </select>
+  <button class="hdr-cancel-btn" id="cancelBtn" onclick="cancelSelection()">✖</button>
+  <button class="hdr-loc-btn" id="hdrLocBtn" onclick="getLocation()">📍 <span id="locBtnTxt">Konumumu Bul</span></button>
 </div>
 
 <div class="wrap">
@@ -125,6 +134,55 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);min-height:100vh;color:
 const SB_URL = 'https://ezmvwhpmvuokrrvsohuv.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV6bXZ3aHBtdnVva3JydnNvaHV2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTcxNDQsImV4cCI6MjA5NDI3MzE0NH0.je77PXmfbjR9H7TWzVhpQ4Kt6mTRiI0UfS9pHQzpHhU';
 const COLORS = ['#1E88E5','#E53935','#43A047','#FB8C00','#8E24AA','#00ACC1','#F4511E','#3949AB','#00897B','#D81B60'];
+
+const T = {
+  tr: {
+    locBtn:'Konumumu Bul', locating:'📍 Belirleniyor...', locOk:'✅ Konum Alındı', locErr:'↩ Konum Alınamadı', locNo:'❌ GPS Desteklenmiyor',
+    mapTitle:'🗺️ Hat Haritası', routeTitle:'🚌 Hat Seç', busTitle:'🚌 Aktif Otobüsler',
+    loading:'Yükleniyor...', noRoutes:'Kayıtlı hat yok', noRouteErr:'Hat yükleme hatası',
+    noBuses:'Bu hatta aktif otobüs yok', refresh:'🔄 Yenile', autoRefresh:'🔄 10 sn\'de bir yenileniyor',
+    lastUpdate:'Son güncelleme: ', going:'Gidiş', returning:'Dönüş', choose:'Seç', chosen:'✅ Seçildi',
+    active:'🟢 Aktif', lineLabel:'Hat:', goStart:'Gidiş Başlangıç', goEnd:'Gidiş Sonu', retStart:'Dönüş Başlangıç', retEnd:'Dönüş Sonu',
+    myLoc:'📍 Konumunuz', cancel:'✖ İptal'
+  },
+  en: {
+    locBtn:'Find My Location', locating:'📍 Locating...', locOk:'✅ Location Found', locErr:'↩ Location Failed', locNo:'❌ GPS Not Supported',
+    mapTitle:'🗺️ Route Map', routeTitle:'🚌 Select Route', busTitle:'🚌 Active Buses',
+    loading:'Loading...', noRoutes:'No routes found', noRouteErr:'Route load error',
+    noBuses:'No active buses on this route', refresh:'🔄 Refresh', autoRefresh:'🔄 Auto-refresh every 10s',
+    lastUpdate:'Last update: ', going:'Going', returning:'Return', choose:'Select', chosen:'✅ Selected',
+    active:'🟢 Active', lineLabel:'Route:', goStart:'Going Start', goEnd:'Going End', retStart:'Return Start', retEnd:'Return End',
+    myLoc:'📍 Your Location', cancel:'✖ Cancel'
+  },
+  ar: {
+    locBtn:'تحديد موقعي', locating:'📍 جاري التحديد...', locOk:'✅ تم تحديد موقعك', locErr:'↩ تعذّر التحديد', locNo:'❌ GPS غير مدعوم',
+    mapTitle:'🗺️ خريطة المسارات', routeTitle:'🚌 اختر الخط', busTitle:'🚌 الحافلات الفعالة',
+    loading:'جاري التحميل...', noRoutes:'لا توجد خطوط محفوظة', noRouteErr:'خطأ في تحميل الخطوط',
+    noBuses:'لا توجد حافلات فعالة على هذا الخط الآن', refresh:'🔄 تحديث', autoRefresh:'🔄 تحديث تلقائي كل 10 ثوانٍ',
+    lastUpdate:'آخر تحديث: ', going:'ذهاب', returning:'عودة', choose:'اختر', chosen:'✅ محدد',
+    active:'🟢 متحرك', lineLabel:'الخط:', goStart:'بداية الذهاب', goEnd:'نهاية الذهاب', retStart:'بداية العودة', retEnd:'نهاية العودة',
+    myLoc:'📍 موقعك الحالي', cancel:'✖ إلغاء'
+  }
+};
+
+let lang = 'tr';
+
+function setLang(l){
+  lang = l;
+  const root = document.getElementById('htmlRoot');
+  if(l==='ar'){ root.setAttribute('dir','rtl'); root.setAttribute('lang','ar'); }
+  else { root.setAttribute('dir','ltr'); root.setAttribute('lang',l); }
+  // تحديث النصوص الثابتة
+  document.getElementById('locBtnTxt').textContent = T[l].locBtn;
+  document.getElementById('cancelBtn').textContent = T[l].cancel;
+  const mc = document.querySelector('#mapCard .card-title');
+  if(mc) mc.textContent = T[l].mapTitle;
+  const rc = document.querySelector('#routesCard .card-title');
+  if(rc) rc.textContent = T[l].routeTitle;
+  document.getElementById('updateTime').textContent = T[l].autoRefresh;
+  // إعادة تحميل القوائم إذا كانت مفتوحة
+  if(map) loadRoutes();
+}
 
 let userLat=null, userLng=null;
 let map=null, userMarker=null;
