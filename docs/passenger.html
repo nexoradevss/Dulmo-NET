@@ -90,6 +90,7 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);min-height:100vh;color:
   padding:4px;
   width:56px;height:56px;
   display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
 }
 .app-bar-qr canvas,.app-bar-qr img{border-radius:4px;display:block}
 .install-btn{
@@ -118,6 +119,26 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);min-height:100vh;color:
   flex:1;
 }
 .ios-hint.show{display:block}
+
+/* ══ QR Fullscreen Overlay ══ */
+#qrOverlay{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:9999;
+  background:rgba(0,0,0,.88);
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+}
+#qrOverlay.show{display:flex;}
+#qrBig{
+  background:#fff;
+  border-radius:16px;
+  padding:16px;
+  box-shadow:0 8px 40px rgba(0,0,0,.5);
+}
+#qrBig canvas,#qrBig img{border-radius:8px;display:block;}
 </style>
 </head>
 <body>
@@ -167,6 +188,11 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);min-height:100vh;color:
     <div id="busesList"></div>
   </div>
 
+</div>
+
+<!-- ══ QR Overlay ══ -->
+<div id="qrOverlay" onclick="this.classList.remove('show')">
+  <div id="qrBig"></div>
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -261,9 +287,15 @@ function generateQR(){
   const url = window.location.href.split('?')[0];
   try{
     new QRCode(box,{text:url,width:48,height:48,colorDark:'#1565C0',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
+    // QR كبير للـ overlay
+    const big = document.getElementById('qrBig');
+    big.innerHTML = '';
+    new QRCode(big,{text:url,width:260,height:260,colorDark:'#1565C0',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
   }catch(e){
     box.innerHTML='<div style="font-size:30px;line-height:48px;text-align:center">📱</div>';
   }
+  // فتح الـ overlay عند الضغط على QR الصغير
+  box.onclick = () => document.getElementById('qrOverlay').classList.add('show');
 }
 
 function initAppCard(){
