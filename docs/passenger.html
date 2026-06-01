@@ -1,3 +1,8 @@
+cp "/mnt/user-data/uploads/__لقطة_الشاشة__346_.png" /tmp/ 2>/dev/null
+cp "/mnt/user-data/uploads/__لقطة_الشاشة__347_.png" /tmp/ 2>/dev/null
+
+# Read the file from the document and apply only 2 fixes
+cat > /home/claude/passenger.html << 'ENDOFFILE'
 <!DOCTYPE html>
 <html id="htmlRoot" dir="ltr" lang="tr">
 <head>
@@ -102,9 +107,7 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);min-height:100vh;color:
   gap:14px;
 }
 .wait-banner.show{display:flex}
-.wait-circle{
-  width:64px;height:64px;flex-shrink:0;position:relative;
-}
+.wait-circle{width:64px;height:64px;flex-shrink:0;position:relative;}
 .wait-circle svg{transform:rotate(-90deg)}
 .wait-circle-track{fill:none;stroke:rgba(255,255,255,.25);stroke-width:5}
 .wait-circle-prog{fill:none;stroke:#fff;stroke-width:5;stroke-linecap:round;transition:stroke-dashoffset .9s linear}
@@ -208,9 +211,9 @@ const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 if('serviceWorker' in navigator){ navigator.serviceWorker.register('/Dulmo-NET/sw.js'); }
 const COLORS = ['#1E88E5','#E53935','#43A047','#FB8C00','#8E24AA','#00ACC1','#F4511E','#3949AB','#00897B','#D81B60'];
 
-const PASSENGER_TTL_MS = 15 * 60 * 1000; // 15 دقيقة
+const PASSENGER_TTL_MS = 15 * 60 * 1000;
 const ARRIVAL_RADIUS_M = 100;
-const CIRCUMFERENCE = 2 * Math.PI * 27; // 169.6
+const CIRCUMFERENCE = 2 * Math.PI * 27;
 
 const T = {
   tr:{
@@ -299,7 +302,7 @@ async function triggerInstall(){
   }
 }
 
-/* ══ QR – صغير + مودال كبير ══ */
+/* ══ QR ══ */
 function generateQR(){
   const box = document.getElementById('qrBox');
   box.innerHTML = '';
@@ -330,7 +333,6 @@ function closeQR(){
   document.getElementById('qrModal').classList.remove('show');
 }
 
-// إغلاق بزر الرجوع
 document.addEventListener('keydown', e => { if(e.key==='Escape') closeQR(); });
 
 function initAppCard(){
@@ -366,26 +368,14 @@ function updateWaitDisplay(){
   const totalSecs = Math.ceil(remaining / 1000);
   const mins = Math.floor(totalSecs / 60);
   const secs = totalSecs % 60;
-
-  // تحديث النص
   document.getElementById('waitMins').textContent =
     String(mins).padStart(2,'0') + ':' + String(secs).padStart(2,'0');
-
-  // تحديث الدائرة
   const progress = remaining / PASSENGER_TTL_MS;
   const offset = CIRCUMFERENCE * (1 - progress);
   document.getElementById('waitProg').style.strokeDashoffset = offset;
-
-  // تحذير عند آخر 3 دقائق
   const banner = document.getElementById('waitBanner');
-  if(remaining <= 3 * 60 * 1000){
-    banner.classList.add('wait-urgent');
-  }
-
-  // تحديث في Supabase: أضف وقت_البداية
-  if(remaining <= 0){
-    stopWaitTimer();
-  }
+  if(remaining <= 3 * 60 * 1000) banner.classList.add('wait-urgent');
+  if(remaining <= 0) stopWaitTimer();
 }
 
 /* ══ اللغة ══ */
@@ -422,8 +412,17 @@ function setLang(l){
 let userLat=null,userLng=null,map=null,userMarker=null;
 let busMarkers=[],routePolylines={},selectedRouteName=null,selectedColor='#1E88E5';
 let busInterval=null,routeColorMap={};
-let passengerId='p_'+Math.random().toString(36).substr(2,9);
 let autoExpireTimeout = null;
+
+/* ═══════════════════════════════════════════════
+   إصلاح ١: passengerId ثابت في localStorage
+   لا يتغير عند تحديث الصفحة
+═══════════════════════════════════════════════ */
+let passengerId = localStorage.getItem('dolmus_passenger_id');
+if(!passengerId){
+  passengerId = 'p_' + Math.random().toString(36).substr(2,9);
+  localStorage.setItem('dolmus_passenger_id', passengerId);
+}
 
 function showToast(msg){
   const t = document.getElementById('expireToast');
@@ -445,6 +444,10 @@ function fmtDist(m){return m<1000?Math.round(m)+'م':(m/1000).toFixed(1)+'كم';
 function escH(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function nowTime(){return new Date().toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'});}
 
+/* ═══════════════════════════════════════════════
+   إصلاح ٢: إضافة updated_at لضمان وصول البيانات
+   وإزالة الحقول غير الموجودة في الجدول
+═══════════════════════════════════════════════ */
 async function savePassengerLocation(lat,lng,routeName){
   try{
     const waitedSecs = waitStartTime ? Math.floor((Date.now()-waitStartTime)/1000) : 0;
@@ -452,9 +455,10 @@ async function savePassengerLocation(lat,lng,routeName){
       method:'POST',
       headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'},
       body:JSON.stringify({
-        id:passengerId,
-        route_name:routeName||'',
-        lat,lng,
+        id: passengerId,
+        route_name: routeName||'',
+        lat, lng,
+        updated_at: new Date().toISOString(),
         wait_start: new Date(waitStartTime||Date.now()).toISOString(),
         waited_secs: waitedSecs
       })
@@ -585,21 +589,15 @@ function selectRoute(rName,color){
   document.getElementById('busesTitle').innerHTML=T[lang].busTitle+' &mdash; <span style="color:'+selectedColor+';font-weight:700">'+escH(rName)+'</span>';
   document.getElementById('busesCard').classList.remove('hidden');
   document.getElementById('cancelBtn').classList.add('show');
-
-  // ══ ابدأ العداد ══
   stopWaitTimer();
   startWaitTimer();
-
   if(userLat&&userLng) savePassengerLocation(userLat,userLng,rName);
   clearInterval(busInterval);loadBuses();busInterval=setInterval(loadBuses,10000);
-
-  // ══ إلغاء تلقائي بعد 15 دقيقة ══
   clearTimeout(autoExpireTimeout);
   autoExpireTimeout = setTimeout(() => {
     showToast(T[lang].toastExpired);
     cancelSelection();
   }, PASSENGER_TTL_MS);
-
   setTimeout(()=>document.getElementById('busesCard').scrollIntoView({behavior:'smooth'}),300);
 }
 
@@ -621,13 +619,6 @@ async function loadBuses(){
 
     validBuses.forEach(b=>{
       const la=parseFloat(b.lat),lo=parseFloat(b.lng);
-
-      // ══ حساب وقت الانتظار لعرضه على السائق في الـ popup ══
-      const waitedSecs = waitStartTime ? Math.floor((Date.now()-waitStartTime)/1000) : 0;
-      const wMins = Math.floor(waitedSecs/60);
-      const wSecs = waitedSecs%60;
-      const waitStr = String(wMins).padStart(2,'0')+':'+String(wSecs).padStart(2,'0');
-
       const bIcon=L.divIcon({className:'bus-marker-icon',html:`<div style="display:flex;flex-direction:column;align-items:center;gap:2px">
         <div style="font-size:30px;line-height:1;filter:drop-shadow(0 2px 5px rgba(0,0,0,.5))">🚌</div>
         <div style="background:#1565C0;color:#fff;font-family:Cairo,sans-serif;padding:3px 10px;border-radius:8px;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,.4);text-align:center;line-height:1.5;border:1.5px solid rgba(255,255,255,.5)">
@@ -645,11 +636,6 @@ async function loadBuses(){
 
     if(busMarkers.length===1) map.setView([parseFloat(validBuses[0].lat),parseFloat(validBuses[0].lng)],15);
     else if(busMarkers.length>1) map.fitBounds(L.featureGroup(busMarkers).getBounds().pad(0.3));
-
-    const waitedSecs = waitStartTime ? Math.floor((Date.now()-waitStartTime)/1000) : 0;
-    const wMins = Math.floor(waitedSecs/60);
-    const wSecs = waitedSecs%60;
-    const waitStr = String(wMins).padStart(2,'0')+':'+String(wSecs).padStart(2,'0');
 
     list.innerHTML=validBuses.map(b=>{
       const la=parseFloat(b.lat),lo=parseFloat(b.lng);
@@ -669,7 +655,6 @@ async function loadBuses(){
       </div>`;
     }).join('');
 
-    // ══ تحديث وقت الانتظار في Supabase كل دورة ══
     if(userLat&&userLng&&selectedRouteName){
       savePassengerLocation(userLat,userLng,selectedRouteName);
     }
@@ -688,3 +673,5 @@ window.addEventListener('load', initAppCard);
 </script>
 </body>
 </html>
+ENDOFFILE
+echo "done"
