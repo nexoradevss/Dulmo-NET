@@ -207,7 +207,7 @@ if('serviceWorker' in navigator){ navigator.serviceWorker.register('/Dulmo-NET/s
 const COLORS = ['#1E88E5','#E53935','#43A047','#FB8C00','#8E24AA','#00ACC1','#F4511E','#3949AB','#00897B','#D81B60'];
 
 const PASSENGER_TTL_MS = 15 * 60 * 1000;
-const ARRIVAL_RADIUS_M = 100;
+const ARRIVAL_RADIUS_M = -1;
 const CIRCUMFERENCE = 2 * Math.PI * 27;
 
 const T = {
@@ -607,10 +607,10 @@ async function loadBuses(){
     const validBuses=(Array.isArray(buses)?buses:[]).filter(b=>{const la=parseFloat(b.lat),lo=parseFloat(b.lng);return !isNaN(la)&&!isNaN(lo)&&la!==0&&lo!==0;});
     if(!validBuses.length){list.innerHTML='<div class="empty"><div class="empty-e">😴</div>'+T[lang].noBuses+'</div>';return;}
 
-  /*  if(userLat!=null&&userLng!=null){
+    if(userLat!=null&&userLng!=null){
       const arrived=validBuses.some(b=>calcDist(userLat,userLng,parseFloat(b.lat),parseFloat(b.lng))<ARRIVAL_RADIUS_M);
       if(arrived){showToast(T[lang].toastArrived);setTimeout(()=>cancelSelection(),600);return;}
-   */ }
+    }
 
     validBuses.forEach(b=>{
       const la=parseFloat(b.lat),lo=parseFloat(b.lng);
