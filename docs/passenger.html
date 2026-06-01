@@ -73,72 +73,53 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);min-height:100vh;color:
 .dir-back{background:#F3E5F5;color:#6A1B9A}
 
 /* ══ app-bar ══ */
-.app-bar{
-  background:linear-gradient(135deg,#1565C0 0%,#1E88E5 100%);
-  padding:10px 14px;
-  display:flex;
-  align-items:center;
-  gap:12px;
-  margin-bottom:8px;
-  border-radius:var(--r);
-  box-shadow:var(--shadow);
-}
-.app-bar-qr{
-  flex-shrink:0;
-  background:#fff;
-  border-radius:8px;
-  padding:4px;
-  width:56px;height:56px;
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;
-}
+.app-bar{background:linear-gradient(135deg,#1565C0 0%,#1E88E5 100%);padding:10px 14px;display:flex;align-items:center;gap:12px;margin-bottom:8px;border-radius:var(--r);box-shadow:var(--shadow);}
+.app-bar-qr{flex-shrink:0;background:#fff;border-radius:8px;padding:4px;width:56px;height:56px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .2s;}
+.app-bar-qr:hover{transform:scale(1.05)}
 .app-bar-qr canvas,.app-bar-qr img{border-radius:4px;display:block}
-.install-btn{
-  display:inline-flex;
-  align-items:center;gap:7px;
-  background:#fff;color:var(--blue);
-  border:none;border-radius:10px;
-  padding:12px 16px;
-  font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;
-  cursor:pointer;transition:all .2s;
-  box-shadow:0 2px 8px rgba(0,0,0,.18);
-  white-space:nowrap;
-  flex:1;justify-content:center;
-}
+.install-btn{display:inline-flex;align-items:center;gap:7px;background:#fff;color:var(--blue);border:none;border-radius:10px;padding:12px 16px;font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,.18);white-space:nowrap;flex:1;justify-content:center;}
 .install-btn:hover{background:#E3F2FD;}
 .install-btn.installed{background:var(--green-light);color:var(--green);cursor:default}
-.ios-hint{
-  display:none;
-  background:rgba(255,255,255,.15);
-  border:1px solid rgba(255,255,255,.3);
-  border-radius:10px;
-  padding:6px 10px;
-  font-size:11px;
-  color:#fff;
-  line-height:1.75;
-  flex:1;
-}
+.ios-hint{display:none;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:10px;padding:6px 10px;font-size:11px;color:#fff;line-height:1.75;flex:1;}
 .ios-hint.show{display:block}
 
-/* ══ QR Fullscreen Overlay ══ */
-#qrOverlay{
+/* ══ QR Modal ══ */
+.qr-modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.88);z-index:9999;align-items:center;justify-content:center;flex-direction:column;gap:16px}
+.qr-modal.show{display:flex}
+.qr-modal-box{background:#fff;border-radius:20px;padding:24px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 40px rgba(0,0,0,.4)}
+.qr-modal-hint{color:rgba(255,255,255,.8);font-size:13px;font-family:'Cairo',sans-serif}
+.qr-modal-url{color:#90CAF9;font-size:11px;font-family:monospace;margin-top:4px;word-break:break-all;text-align:center;max-width:280px}
+
+/* ══ عداد الانتظار للراكب ══ */
+.wait-banner{
+  background:linear-gradient(135deg,#E65100,#FF8F00);
+  border-radius:var(--r);
+  padding:12px 16px;
+  margin-bottom:8px;
+  box-shadow:0 4px 16px rgba(230,81,0,.3);
   display:none;
-  position:fixed;
-  inset:0;
-  z-index:9999;
-  background:rgba(0,0,0,.88);
   align-items:center;
-  justify-content:center;
-  cursor:pointer;
+  gap:14px;
 }
-#qrOverlay.show{display:flex;}
-#qrBig{
-  background:#fff;
-  border-radius:16px;
-  padding:16px;
-  box-shadow:0 8px 40px rgba(0,0,0,.5);
+.wait-banner.show{display:flex}
+.wait-circle{
+  width:64px;height:64px;flex-shrink:0;position:relative;
 }
-#qrBig canvas,#qrBig img{border-radius:8px;display:block;}
+.wait-circle svg{transform:rotate(-90deg)}
+.wait-circle-track{fill:none;stroke:rgba(255,255,255,.25);stroke-width:5}
+.wait-circle-prog{fill:none;stroke:#fff;stroke-width:5;stroke-linecap:round;transition:stroke-dashoffset .9s linear}
+.wait-circle-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Cairo',sans-serif;font-weight:700;color:#fff;text-align:center;line-height:1.1}
+.wait-circle-mins{font-size:17px}
+.wait-circle-sec{font-size:10px;opacity:.85}
+.wait-body{flex:1;color:#fff}
+.wait-title{font-size:13px;font-weight:700;margin-bottom:2px}
+.wait-sub{font-size:11px;opacity:.85}
+.wait-urgent .wait-circle-prog{stroke:#FFD54F}
+.wait-urgent{background:linear-gradient(135deg,#C62828,#E53935)}
+
+/* ══ expire toast ══ */
+.expire-toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1A2332;color:#fff;padding:10px 20px;border-radius:12px;font-family:'Cairo',sans-serif;font-size:13px;font-weight:700;box-shadow:0 4px 20px rgba(0,0,0,.35);z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;}
+.expire-toast.show{opacity:1}
 </style>
 </head>
 <body>
@@ -155,16 +136,44 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);min-height:100vh;color:
   <button class="hdr-loc-btn" id="hdrLocBtn" onclick="getLocation()">📍 <span id="locBtnTxt">Konumumu Bul</span></button>
 </div>
 
+<div class="expire-toast" id="expireToast"></div>
+
+<!-- QR Modal -->
+<div class="qr-modal" id="qrModal" onclick="closeQR()">
+  <div class="qr-modal-box" id="qrModalBox" onclick="event.stopPropagation()"></div>
+  <div class="qr-modal-hint" id="qrModalHint">اضغط خارج الإطار للإغلاق</div>
+  <div class="qr-modal-url" id="qrModalUrl"></div>
+</div>
+
 <div class="wrap">
 
   <!-- ══ شريط التثبيت ══ -->
   <div class="app-bar" id="appBar">
-    <div class="app-bar-qr" id="qrBox"></div>
+    <div class="app-bar-qr" id="qrBox" onclick="openQR()" title="اضغط لتكبير QR"></div>
     <button class="install-btn" id="installBtn" onclick="triggerInstall()">
       <span id="installBtnIcon">➕</span>
       <span id="installBtnTxt">Ana Ekrana Ekle</span>
     </button>
     <div class="ios-hint" id="iosHint"></div>
+  </div>
+
+  <!-- ══ بانر عداد الانتظار ══ -->
+  <div class="wait-banner" id="waitBanner">
+    <div class="wait-circle" id="waitCircle">
+      <svg width="64" height="64" viewBox="0 0 64 64">
+        <circle class="wait-circle-track" cx="32" cy="32" r="27"/>
+        <circle class="wait-circle-prog" id="waitProg" cx="32" cy="32" r="27"
+          stroke-dasharray="169.6" stroke-dashoffset="0"/>
+      </svg>
+      <div class="wait-circle-text">
+        <div class="wait-circle-mins" id="waitMins">15:00</div>
+        <div class="wait-circle-sec" id="waitLabel">دقيقة</div>
+      </div>
+    </div>
+    <div class="wait-body">
+      <div class="wait-title" id="waitTitle">⏳ وقت الانتظار</div>
+      <div class="wait-sub" id="waitSub">سيُلغى الطلب تلقائياً بعد انتهاء الوقت</div>
+    </div>
   </div>
 
   <div class="card" id="mapCard">
@@ -190,11 +199,6 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);min-height:100vh;color:
 
 </div>
 
-<!-- ══ QR Overlay ══ -->
-<div id="qrOverlay" onclick="this.classList.remove('show')">
-  <div id="qrBig"></div>
-</div>
-
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
@@ -203,6 +207,10 @@ const SB_URL = 'https://ezmvwhpmvuokrrvsohuv.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV6bXZ3aHBtdnVva3JydnNvaHV2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTcxNDQsImV4cCI6MjA5NDI3MzE0NH0.je77PXmfbjR9H7TWzVhpQ4Kt6mTRiI0UfS9pHQzpHhU';
 if('serviceWorker' in navigator){ navigator.serviceWorker.register('/Dulmo-NET/sw.js'); }
 const COLORS = ['#1E88E5','#E53935','#43A047','#FB8C00','#8E24AA','#00ACC1','#F4511E','#3949AB','#00897B','#D81B60'];
+
+const PASSENGER_TTL_MS = 15 * 60 * 1000; // 15 دقيقة
+const ARRIVAL_RADIUS_M = 100;
+const CIRCUMFERENCE = 2 * Math.PI * 27; // 169.6
 
 const T = {
   tr:{
@@ -215,7 +223,13 @@ const T = {
     retStart:'Dönüş Başlangıç',retEnd:'Dönüş Sonu',myLoc:'📍 Konumunuz',cancel:'✖ İptal',
     moving:'🟢 Aktif',connErr:'Bağlantı hatası',
     installBtn:'Ana Ekrana Ekle',installedBtn:'✅ Eklendi!',
-    iosHint:'<b>Safari:</b> Paylaş 🔗 → <b>Ana Ekrana Ekle</b>'
+    iosHint:'<b>Safari:</b> Paylaş 🔗 → <b>Ana Ekrana Ekle</b>',
+    toastArrived:'🚌 Otobüs yaklaştı — talep iptal edildi',
+    toastExpired:'⏱️ 15 dk geçti — talep iptal edildi',
+    waitTitle:'⏳ Bekleme Süresi',
+    waitSub:'Süre bitince talep otomatik iptal edilir',
+    waitLabel:'dk',
+    qrClose:'Kapatmak için dışarıya dokun'
   },
   en:{
     locBtn:'Find My Location',locating:'⏳ Locating...',locOk:'✅ Location Found',locErr:'↩ Location Failed',locNo:'❌ GPS Not Supported',
@@ -227,7 +241,13 @@ const T = {
     retStart:'Return Start',retEnd:'Return End',myLoc:'📍 Your Location',cancel:'✖ Cancel',
     moving:'🟢 Active',connErr:'Connection error',
     installBtn:'Add to Home Screen',installedBtn:'✅ Added!',
-    iosHint:'<b>Safari:</b> Share 🔗 → <b>Add to Home Screen</b>'
+    iosHint:'<b>Safari:</b> Share 🔗 → <b>Add to Home Screen</b>',
+    toastArrived:'🚌 Bus arrived — request cancelled',
+    toastExpired:'⏱️ 15 min passed — request cancelled',
+    waitTitle:'⏳ Waiting Time',
+    waitSub:'Request will auto-cancel when time runs out',
+    waitLabel:'min',
+    qrClose:'Tap outside to close'
   },
   ar:{
     locBtn:'تحديد موقعي',locating:'⏳ جاري التحديد...',locOk:'✅ تم تحديد موقعك',locErr:'↩ تعذّر التحديد',locNo:'❌ GPS غير مدعوم',
@@ -239,7 +259,13 @@ const T = {
     retStart:'بداية العودة',retEnd:'نهاية العودة',myLoc:'📍 موقعك الحالي',cancel:'✖ إلغاء',
     moving:'🟢 متحرك',connErr:'خطأ في الاتصال',
     installBtn:'أضف إلى الشاشة الرئيسية',installedBtn:'✅ تمت الإضافة!',
-    iosHint:'<b>Safari:</b> زر المشاركة 🔗 ← <b>إضافة إلى الشاشة الرئيسية</b>'
+    iosHint:'<b>Safari:</b> زر المشاركة 🔗 ← <b>إضافة إلى الشاشة الرئيسية</b>',
+    toastArrived:'🚌 اقتربت الحافلة — تم إلغاء الطلب',
+    toastExpired:'⏱️ انتهت 15 دقيقة — تم إلغاء الطلب',
+    waitTitle:'⏳ وقت الانتظار',
+    waitSub:'سيُلغى الطلب تلقائياً بعد انتهاء الوقت',
+    waitLabel:'دقيقة',
+    qrClose:'اضغط خارج الإطار للإغلاق'
   }
 };
 
@@ -250,22 +276,14 @@ let deferredPrompt = null;
 const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
 const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 
-window.addEventListener('beforeinstallprompt', e => {
-  e.preventDefault();
-  deferredPrompt = e;
-});
-
-window.addEventListener('appinstalled', () => {
-  deferredPrompt = null;
-  markInstalled();
-});
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredPrompt = e; });
+window.addEventListener('appinstalled', () => { deferredPrompt = null; markInstalled(); });
 
 function markInstalled(){
   const btn = document.getElementById('installBtn');
   document.getElementById('installBtnIcon').textContent = '✅';
   document.getElementById('installBtnTxt').textContent = T[lang].installedBtn;
-  btn.classList.add('installed');
-  btn.disabled = true;
+  btn.classList.add('installed'); btn.disabled = true;
   document.getElementById('iosHint').classList.remove('show');
 }
 
@@ -281,27 +299,92 @@ async function triggerInstall(){
   }
 }
 
+/* ══ QR – صغير + مودال كبير ══ */
 function generateQR(){
   const box = document.getElementById('qrBox');
   box.innerHTML = '';
   const url = window.location.href.split('?')[0];
   try{
     new QRCode(box,{text:url,width:48,height:48,colorDark:'#1565C0',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
-    const big = document.getElementById('qrBig');
-    big.innerHTML = '';
-    new QRCode(big,{text:url,width:260,height:260,colorDark:'#1565C0',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
   }catch(e){
     box.innerHTML='<div style="font-size:30px;line-height:48px;text-align:center">📱</div>';
   }
-  box.onclick = () => document.getElementById('qrOverlay').classList.add('show');
 }
+
+function openQR(){
+  const modal = document.getElementById('qrModal');
+  const box = document.getElementById('qrModalBox');
+  const url = window.location.href.split('?')[0];
+  box.innerHTML = '';
+  try{
+    new QRCode(box,{text:url,width:240,height:240,colorDark:'#1565C0',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
+  }catch(e){
+    box.innerHTML='<div style="font-size:80px;text-align:center;padding:20px">📱</div>';
+  }
+  document.getElementById('qrModalUrl').textContent = url;
+  document.getElementById('qrModalHint').textContent = T[lang].qrClose;
+  modal.classList.add('show');
+}
+
+function closeQR(){
+  document.getElementById('qrModal').classList.remove('show');
+}
+
+// إغلاق بزر الرجوع
+document.addEventListener('keydown', e => { if(e.key==='Escape') closeQR(); });
 
 function initAppCard(){
   generateQR();
   document.getElementById('iosHint').innerHTML = T[lang].iosHint;
-  if(isStandalone){ markInstalled(); return; }
-  if(isIOS){
-    document.getElementById('installBtn').style.display = 'inline-flex';
+  if(isStandalone) markInstalled();
+}
+
+/* ══ عداد الانتظار ══ */
+let waitInterval = null;
+let waitStartTime = null;
+
+function startWaitTimer(){
+  waitStartTime = Date.now();
+  const banner = document.getElementById('waitBanner');
+  banner.classList.add('show');
+  updateWaitDisplay();
+  waitInterval = setInterval(updateWaitDisplay, 1000);
+}
+
+function stopWaitTimer(){
+  clearInterval(waitInterval);
+  waitInterval = null;
+  waitStartTime = null;
+  document.getElementById('waitBanner').classList.remove('show');
+  document.getElementById('waitBanner').classList.remove('wait-urgent');
+}
+
+function updateWaitDisplay(){
+  if(!waitStartTime) return;
+  const elapsed = Date.now() - waitStartTime;
+  const remaining = Math.max(0, PASSENGER_TTL_MS - elapsed);
+  const totalSecs = Math.ceil(remaining / 1000);
+  const mins = Math.floor(totalSecs / 60);
+  const secs = totalSecs % 60;
+
+  // تحديث النص
+  document.getElementById('waitMins').textContent =
+    String(mins).padStart(2,'0') + ':' + String(secs).padStart(2,'0');
+
+  // تحديث الدائرة
+  const progress = remaining / PASSENGER_TTL_MS;
+  const offset = CIRCUMFERENCE * (1 - progress);
+  document.getElementById('waitProg').style.strokeDashoffset = offset;
+
+  // تحذير عند آخر 3 دقائق
+  const banner = document.getElementById('waitBanner');
+  if(remaining <= 3 * 60 * 1000){
+    banner.classList.add('wait-urgent');
+  }
+
+  // تحديث في Supabase: أضف وقت_البداية
+  if(remaining <= 0){
+    stopWaitTimer();
   }
 }
 
@@ -318,9 +401,11 @@ function setLang(l){
   document.getElementById('refreshBtn').textContent = T[l].refresh;
   document.getElementById('updateTime').textContent = T[l].autoRefresh;
   document.getElementById('iosHint').innerHTML = T[l].iosHint;
+  document.getElementById('waitTitle').textContent = T[l].waitTitle;
+  document.getElementById('waitSub').textContent = T[l].waitSub;
+  document.getElementById('waitLabel').textContent = T[l].waitLabel;
   const ibt = document.getElementById('installBtnTxt');
-  if(ibt && !document.getElementById('installBtn').disabled)
-    ibt.textContent = T[l].installBtn;
+  if(ibt && !document.getElementById('installBtn').disabled) ibt.textContent = T[l].installBtn;
   const hdrBtn = document.getElementById('hdrLocBtn');
   if(hdrBtn.classList.contains('ok')) document.getElementById('locBtnTxt').textContent = T[l].locOk;
   else if(hdrBtn.classList.contains('err')) document.getElementById('locBtnTxt').textContent = T[l].locErr;
@@ -336,16 +421,15 @@ function setLang(l){
 /* ══ المنطق الأصلي ══ */
 let userLat=null,userLng=null,map=null,userMarker=null;
 let busMarkers=[],routePolylines={},selectedRouteName=null,selectedColor='#1E88E5';
-let busInterval=null,heartbeatInterval=null,routeColorMap={};
+let busInterval=null,routeColorMap={};
+let passengerId='p_'+Math.random().toString(36).substr(2,9);
+let autoExpireTimeout = null;
 
-/* ═══════════════════════════════════════════════════
-   تعديل ١: passengerId ثابت في localStorage
-   بدلاً من إنشاء ID جديد في كل مرة
-═══════════════════════════════════════════════════ */
-let passengerId = localStorage.getItem('dolmus_passenger_id');
-if(!passengerId){
-  passengerId = 'p_' + Math.random().toString(36).substr(2,9);
-  localStorage.setItem('dolmus_passenger_id', passengerId);
+function showToast(msg){
+  const t = document.getElementById('expireToast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 4000);
 }
 
 function sbGet(table,params=''){
@@ -361,12 +445,9 @@ function fmtDist(m){return m<1000?Math.round(m)+'م':(m/1000).toFixed(1)+'كم';
 function escH(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function nowTime(){return new Date().toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'});}
 
-/* ═══════════════════════════════════════════════════
-   تعديل ٢: savePassengerLocation يرسل updated_at
-   لتتبع آخر نشاط للراكب
-═══════════════════════════════════════════════════ */
 async function savePassengerLocation(lat,lng,routeName){
   try{
+    const waitedSecs = waitStartTime ? Math.floor((Date.now()-waitStartTime)/1000) : 0;
     await fetch(`${SB_URL}/rest/v1/passenger_locations`,{
       method:'POST',
       headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'},
@@ -374,7 +455,8 @@ async function savePassengerLocation(lat,lng,routeName){
         id:passengerId,
         route_name:routeName||'',
         lat,lng,
-        updated_at: new Date().toISOString()
+        wait_start: new Date(waitStartTime||Date.now()).toISOString(),
+        waited_secs: waitedSecs
       })
     });
   }catch(e){console.error(e);}
@@ -388,41 +470,10 @@ async function deletePassengerLocation(){
   }catch(e){console.error(e);}
 }
 
-/* ═══════════════════════════════════════════════════
-   تعديل ٣: إغلاق المتصفح — محاولة الحذف بكل الطرق
-   visibilitychange + pagehide + beforeunload
-═══════════════════════════════════════════════════ */
-function tryDeleteOnExit(){
-  if(!selectedRouteName) return;
-  // الطريقة الأفضل على الموبايل: sendBeacon
-  const url = `${SB_URL}/rest/v1/passenger_locations?id=eq.${passengerId}`;
-  const sent = navigator.sendBeacon
-    ? navigator.sendBeacon(url + '&_method=DELETE', new Blob(
-        [JSON.stringify({})],
-        {type:'application/json'}
-      ))
-    : false;
-  // احتياطي: fetch مع keepalive
-  if(!sent){
-    fetch(url,{
-      method:'DELETE',
-      headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY},
-      keepalive:true
-    }).catch(()=>{});
-  }
-}
-
-// عند إخفاء الصفحة (الموبايل يضغط الزر الرئيسي أو يغلق)
-document.addEventListener('visibilitychange',()=>{
-  if(document.visibilityState === 'hidden') tryDeleteOnExit();
-});
-
-// عند إغلاق أو تحديث المتصفح
-window.addEventListener('pagehide', tryDeleteOnExit);
-window.addEventListener('beforeunload', tryDeleteOnExit);
-
 async function cancelSelection(){
-  clearInterval(heartbeatInterval);
+  clearTimeout(autoExpireTimeout);
+  autoExpireTimeout = null;
+  stopWaitTimer();
   await deletePassengerLocation();
   selectedRouteName=null;clearInterval(busInterval);
   document.getElementById('busesCard').classList.add('hidden');
@@ -534,20 +585,21 @@ function selectRoute(rName,color){
   document.getElementById('busesTitle').innerHTML=T[lang].busTitle+' &mdash; <span style="color:'+selectedColor+';font-weight:700">'+escH(rName)+'</span>';
   document.getElementById('busesCard').classList.remove('hidden');
   document.getElementById('cancelBtn').classList.add('show');
+
+  // ══ ابدأ العداد ══
+  stopWaitTimer();
+  startWaitTimer();
+
   if(userLat&&userLng) savePassengerLocation(userLat,userLng,rName);
-
-  /* ═══════════════════════════════════════════════════
-     تعديل ٤: heartbeat كل 5 دقائق لتحديث updated_at
-     يضمن أن الراكب النشط لا يُحذف تلقائياً
-  ═══════════════════════════════════════════════════ */
-  clearInterval(heartbeatInterval);
-  heartbeatInterval = setInterval(()=>{
-    if(userLat && userLng && selectedRouteName){
-      savePassengerLocation(userLat, userLng, selectedRouteName);
-    }
-  }, 5 * 60 * 1000); // كل 5 دقائق
-
   clearInterval(busInterval);loadBuses();busInterval=setInterval(loadBuses,10000);
+
+  // ══ إلغاء تلقائي بعد 15 دقيقة ══
+  clearTimeout(autoExpireTimeout);
+  autoExpireTimeout = setTimeout(() => {
+    showToast(T[lang].toastExpired);
+    cancelSelection();
+  }, PASSENGER_TTL_MS);
+
   setTimeout(()=>document.getElementById('busesCard').scrollIntoView({behavior:'smooth'}),300);
 }
 
@@ -561,24 +613,77 @@ async function loadBuses(){
     document.getElementById('updateTime').textContent=T[lang].lastUpdate+nowTime()+' 🔄';
     const validBuses=(Array.isArray(buses)?buses:[]).filter(b=>{const la=parseFloat(b.lat),lo=parseFloat(b.lng);return !isNaN(la)&&!isNaN(lo)&&la!==0&&lo!==0;});
     if(!validBuses.length){list.innerHTML='<div class="empty"><div class="empty-e">😴</div>'+T[lang].noBuses+'</div>';return;}
+
+    if(userLat!=null&&userLng!=null){
+      const arrived=validBuses.some(b=>calcDist(userLat,userLng,parseFloat(b.lat),parseFloat(b.lng))<ARRIVAL_RADIUS_M);
+      if(arrived){showToast(T[lang].toastArrived);setTimeout(()=>cancelSelection(),600);return;}
+    }
+
     validBuses.forEach(b=>{
       const la=parseFloat(b.lat),lo=parseFloat(b.lng);
-      const bIcon=L.divIcon({className:'bus-marker-icon',html:`<div style="display:flex;flex-direction:column;align-items:center;gap:2px"><div style="font-size:30px;line-height:1;filter:drop-shadow(0 2px 5px rgba(0,0,0,.5))">🚌</div><div style="background:#1565C0;color:#fff;font-family:Cairo,sans-serif;padding:3px 10px;border-radius:8px;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,.4);text-align:center;line-height:1.5;border:1.5px solid rgba(255,255,255,.5)"><div style="font-size:12px;font-weight:700">${escH(b.driver_name)}</div><div style="font-size:11px;font-weight:600;opacity:.9">${escH(b.route_name)}</div></div></div>`,iconSize:[130,72],iconAnchor:[65,34]});
-      busMarkers.push(L.marker([la,lo],{icon:bIcon,zIndexOffset:500}).addTo(map).bindPopup(`<div style="font-family:Cairo;min-width:140px"><b>${escH(b.driver_name)}</b><br><span style="color:#607D8B;font-size:12px">${T[lang].lineLabel} ${escH(b.route_name)}</span></div>`));
+
+      // ══ حساب وقت الانتظار لعرضه على السائق في الـ popup ══
+      const waitedSecs = waitStartTime ? Math.floor((Date.now()-waitStartTime)/1000) : 0;
+      const wMins = Math.floor(waitedSecs/60);
+      const wSecs = waitedSecs%60;
+      const waitStr = String(wMins).padStart(2,'0')+':'+String(wSecs).padStart(2,'0');
+
+      const bIcon=L.divIcon({className:'bus-marker-icon',html:`<div style="display:flex;flex-direction:column;align-items:center;gap:2px">
+        <div style="font-size:30px;line-height:1;filter:drop-shadow(0 2px 5px rgba(0,0,0,.5))">🚌</div>
+        <div style="background:#1565C0;color:#fff;font-family:Cairo,sans-serif;padding:3px 10px;border-radius:8px;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,.4);text-align:center;line-height:1.5;border:1.5px solid rgba(255,255,255,.5)">
+          <div style="font-size:12px;font-weight:700">${escH(b.driver_name)}</div>
+          <div style="font-size:11px;font-weight:600;opacity:.9">${escH(b.route_name)}</div>
+        </div>
+      </div>`,iconSize:[130,72],iconAnchor:[65,34]});
+      busMarkers.push(L.marker([la,lo],{icon:bIcon,zIndexOffset:500}).addTo(map).bindPopup(
+        `<div style="font-family:Cairo;min-width:140px">
+          <b>${escH(b.driver_name)}</b><br>
+          <span style="color:#607D8B;font-size:12px">${T[lang].lineLabel} ${escH(b.route_name)}</span>
+        </div>`
+      ));
     });
+
     if(busMarkers.length===1) map.setView([parseFloat(validBuses[0].lat),parseFloat(validBuses[0].lng)],15);
     else if(busMarkers.length>1) map.fitBounds(L.featureGroup(busMarkers).getBounds().pad(0.3));
+
+    const waitedSecs = waitStartTime ? Math.floor((Date.now()-waitStartTime)/1000) : 0;
+    const wMins = Math.floor(waitedSecs/60);
+    const wSecs = waitedSecs%60;
+    const waitStr = String(wMins).padStart(2,'0')+':'+String(wSecs).padStart(2,'0');
+
     list.innerHTML=validBuses.map(b=>{
       const la=parseFloat(b.lat),lo=parseFloat(b.lng);
       const dist=userLat!=null?calcDist(userLat,userLng,la,lo):null;
       const mins=dist?Math.max(1,Math.round(dist/300)):null;
-      return `<div class="bus-row"><div class="bus-icon">🚌</div><div class="bus-body"><div class="bus-name">${escH(b.driver_name)}</div><div class="bus-meta">${T[lang].lineLabel} <b>${escH(b.route_name)}</b></div></div><div class="bus-right"><div class="bus-status bs-on">${T[lang].moving}</div>${dist!==null?`<div class="bus-dist">${fmtDist(dist)}</div>`:''} ${mins?`<div class="bus-eta">~${mins} dk</div>`:''}</div></div>`;
+      return `<div class="bus-row">
+        <div class="bus-icon">🚌</div>
+        <div class="bus-body">
+          <div class="bus-name">${escH(b.driver_name)}</div>
+          <div class="bus-meta">${T[lang].lineLabel} <b>${escH(b.route_name)}</b></div>
+        </div>
+        <div class="bus-right">
+          <div class="bus-status bs-on">${T[lang].moving}</div>
+          ${dist!==null?`<div class="bus-dist">${fmtDist(dist)}</div>`:''}
+          ${mins?`<div class="bus-eta">~${mins} dk</div>`:''}
+        </div>
+      </div>`;
     }).join('');
+
+    // ══ تحديث وقت الانتظار في Supabase كل دورة ══
+    if(userLat&&userLng&&selectedRouteName){
+      savePassengerLocation(userLat,userLng,selectedRouteName);
+    }
+
   }catch(e){
     list.innerHTML='<div class="empty"><div class="empty-e">❌</div>'+T[lang].connErr+': '+escH(e.message)+'</div>';
   }
 }
 
+window.addEventListener('beforeunload',()=>{
+  clearTimeout(autoExpireTimeout);
+  stopWaitTimer();
+  deletePassengerLocation();
+});
 window.addEventListener('load', initAppCard);
 </script>
 </body>
