@@ -7,6 +7,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>Dolmuş NET</title>
+<link rel="manifest" href="/Dulmo-NET/manifest.json">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
@@ -174,7 +175,7 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);min-height:100vh;color:
 <script>
 const SB_URL = 'https://ezmvwhpmvuokrrvsohuv.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV6bXZ3aHBtdnVva3JydnNvaHV2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTcxNDQsImV4cCI6MjA5NDI3MzE0NH0.je77PXmfbjR9H7TWzVhpQ4Kt6mTRiI0UfS9pHQzpHhU';
-if('serviceWorker' in navigator){ navigator.serviceWorker.register('./sw.js'); }
+if('serviceWorker' in navigator){ navigator.serviceWorker.register('/Dulmo-NET/sw.js'); }
 const COLORS = ['#1E88E5','#E53935','#43A047','#FB8C00','#8E24AA','#00ACC1','#F4511E','#3949AB','#00897B','#D81B60'];
 
 const T = {
