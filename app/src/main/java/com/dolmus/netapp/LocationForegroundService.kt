@@ -163,7 +163,7 @@ class LocationForegroundService : Service() {
     }
 
     private fun handleCalibrationPoint(loc: Location) {
-        val shouldSave = lastSavedLocation?.let { it.distanceTo(loc) >= 10f } ?: true
+        val shouldSave = lastSavedLocation?.let { it.distanceTo(loc) >= 50f } ?: true
         if (shouldSave) {
             lastSavedLocation = loc
             calibrationPoints.add(loc)
