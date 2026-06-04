@@ -1,4 +1,4 @@
-package com.dolmus.netapp
+﻿package com.dolmus.netapp
 
 import android.content.Context
 import android.content.SharedPreferences

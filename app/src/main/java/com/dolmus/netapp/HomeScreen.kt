@@ -61,11 +61,6 @@ fun HomeScreen(lang: String = "tr", onLogout: () -> Unit = {}) {
     val driverCity = remember { getDriverCity(context) }
 
     LaunchedEffect(Unit) {
-        if (CalibrationSession.hasPendingGoing(context)) {
-            routeName = CalibrationSession.getRouteName(context)
-            screen = "calibration"
-        }
-
         isLoadingCityRoutes = true
         try {
             val result = supabase.postgrest["routes"]
