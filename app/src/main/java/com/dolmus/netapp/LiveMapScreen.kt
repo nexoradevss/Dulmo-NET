@@ -81,6 +81,41 @@ fun loadRouteLocally(context: Context, routeName: String, direction: String): Li
     }
 }
 
+// ─── أيقونة محطة البداية / النهاية ──────────────────────────────
+fun createStopIcon(
+    context: Context,
+    emoji: String,
+    label: String,
+    bgColor: String
+): android.graphics.drawable.BitmapDrawable {
+    val width  = 220
+    val height = 130
+    val bitmap = android.graphics.Bitmap.createBitmap(width, height, android.graphics.Bitmap.Config.ARGB_8888)
+    val canvas = android.graphics.Canvas(bitmap)
+    val cx     = width / 2f
+
+    val bgPaint = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
+        color = android.graphics.Color.parseColor(bgColor)
+    }
+    canvas.drawRoundRect(android.graphics.RectF(cx - 100f, 0f, cx + 100f, 55f), 12f, 12f, bgPaint)
+
+    val textPaint = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
+        color     = android.graphics.Color.WHITE
+        textAlign = android.graphics.Paint.Align.CENTER
+        typeface  = android.graphics.Typeface.DEFAULT_BOLD
+        textSize  = 20f
+    }
+    val displayLabel = if (label.length > 14) label.take(14) + "…" else label
+    canvas.drawText(displayLabel, cx, 36f, textPaint)
+
+    val emojiPaint = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
+        textSize  = 60f
+        textAlign = android.graphics.Paint.Align.CENTER
+    }
+    canvas.drawText(emoji, cx, 120f, emojiPaint)
+    return android.graphics.drawable.BitmapDrawable(context.resources, bitmap)
+}
+
 // ─── أيقونة حافلتك ───────────────────────────────────────────────
 fun createBusIcon(
     context: Context,
@@ -191,12 +226,14 @@ fun drawRouteOnMap(
     Marker(mapView).also { m ->
         m.position = geoPoints.first()
         m.title    = startTitle
+        m.icon     = createStopIcon(mapView.context, "🏠", startTitle, "#CC2E7D32")
         m.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
         mapView.overlays.add(m)
     }
     Marker(mapView).also { m ->
         m.position = geoPoints.last()
         m.title    = endTitle
+        m.icon     = createStopIcon(mapView.context, "🏁", endTitle, "#CCE53935")
         m.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
         mapView.overlays.add(m)
     }
@@ -269,11 +306,14 @@ fun LiveMapScreen(lang: String, routeName: String, onEndWork: (WorkReport) -> Un
                 val going     = results.firstOrNull { it.direction == "going" }
                 val returning = results.firstOrNull { it.direction == "returning" }
 
+                val savedStart = CalibrationSession.getStartLabel(context)
+                val savedEnd   = CalibrationSession.getEndLabel(context)
+
                 going?.let {
                     if (it.points.isNotEmpty()) {
                         drawRouteOnMap(mapView, it.points, goingPolyline,
-                            when(lang) { "tr" -> "Gidiş Başlangıç"; "en" -> "Going Start"; else -> "بداية الذهاب" },
-                            when(lang) { "tr" -> "Gidiş Sonu"; "en" -> "Going End"; else -> "نهاية الذهاب" }
+                            if (savedStart.isNotBlank()) savedStart else when(lang) { "tr" -> "Gidiş Başlangıç"; "en" -> "Going Start"; else -> "بداية الذهاب" },
+                            if (savedEnd.isNotBlank())   savedEnd   else when(lang) { "tr" -> "Gidiş Sonu"; "en" -> "Going End"; else -> "نهاية الذهاب" }
                         )
                         saveRouteLocally(context, routeName, "going", it.points)
                     }
@@ -281,8 +321,8 @@ fun LiveMapScreen(lang: String, routeName: String, onEndWork: (WorkReport) -> Un
                 returning?.let {
                     if (it.points.isNotEmpty()) {
                         drawRouteOnMap(mapView, it.points, returningPolyline,
-                            when(lang) { "tr" -> "Dönüş Başlangıç"; "en" -> "Return Start"; else -> "بداية العودة" },
-                            when(lang) { "tr" -> "Dönüş Sonu"; "en" -> "Return End"; else -> "نهاية العودة" }
+                            if (savedEnd.isNotBlank())   savedEnd   else when(lang) { "tr" -> "Dönüş Başlangıç"; "en" -> "Return Start"; else -> "بداية العودة" },
+                            if (savedStart.isNotBlank()) savedStart else when(lang) { "tr" -> "Dönüş Sonu"; "en" -> "Return End"; else -> "نهاية العودة" }
                         )
                         saveRouteLocally(context, routeName, "returning", it.points)
                     }
@@ -343,15 +383,16 @@ fun LiveMapScreen(lang: String, routeName: String, onEndWork: (WorkReport) -> Un
     LaunchedEffect(routeName) {
         while (true) {
             try {
-                val result = supabase.postgrest["passenger_locations"]
-                    .select { filter { eq("route_name", routeName) } }
-                    .decodeList<PassengerLocation>()
+                val fifteenMinutesAgo = java.time.OffsetDateTime.now()
+                    .minusMinutes(15)
+                    .toString()
 
-                val currentIds = result.map { it.id }.toSet()
-                passengerMarkers.keys.filter { it !in currentIds }.forEach { id ->
-                    mapView.overlays.remove(passengerMarkers[id])
-                    passengerMarkers.remove(id)
-                }
+                val result = supabase.postgrest["passenger_locations"]
+                    .select { filter {
+                        eq("route_name", routeName)
+                        gte("updated_at", fifteenMinutesAgo)
+                    }}
+                    .decodeList<PassengerLocation>()
 
                 result.forEach { p ->
                     val point    = GeoPoint(p.lat, p.lng)
@@ -390,17 +431,21 @@ fun LiveMapScreen(lang: String, routeName: String, onEndWork: (WorkReport) -> Un
         val goingPoints     = loadRouteLocally(context, routeName, "going")
         val returningPoints = loadRouteLocally(context, routeName, "returning")
 
+        // ─── أسماء المحطات المحفوظة ──────────────────────────────
+        val savedStart = CalibrationSession.getStartLabel(context)
+        val savedEnd   = CalibrationSession.getEndLabel(context)
+
         if (goingPoints.isNotEmpty()) {
             drawRouteOnMap(mapView, goingPoints, goingPolyline,
-                when(lang) { "tr" -> "Gidiş Başlangıç"; "en" -> "Going Start"; else -> "بداية الذهاب" },
-                when(lang) { "tr" -> "Gidiş Sonu"; "en" -> "Going End"; else -> "نهاية الذهاب" }
+                if (savedStart.isNotBlank()) savedStart else when(lang) { "tr" -> "Gidiş Başlangıç"; "en" -> "Going Start"; else -> "بداية الذهاب" },
+                if (savedEnd.isNotBlank())   savedEnd   else when(lang) { "tr" -> "Gidiş Sonu"; "en" -> "Going End"; else -> "نهاية الذهاب" }
             )
         }
 
         if (returningPoints.isNotEmpty()) {
             drawRouteOnMap(mapView, returningPoints, returningPolyline,
-                when(lang) { "tr" -> "Dönüş Başlangıç"; "en" -> "Return Start"; else -> "بداية العودة" },
-                when(lang) { "tr" -> "Dönüş Sonu"; "en" -> "Return End"; else -> "نهاية العودة" }
+                if (savedEnd.isNotBlank())   savedEnd   else when(lang) { "tr" -> "Dönüş Başlangıç"; "en" -> "Return Start"; else -> "بداية العودة" },
+                if (savedStart.isNotBlank()) savedStart else when(lang) { "tr" -> "Dönüş Sonu"; "en" -> "Return End"; else -> "نهاية العودة" }
             )
         }
 
