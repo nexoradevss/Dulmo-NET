@@ -192,6 +192,7 @@ fun CalibrationScreen(
         }
     }
 
+    // ─── شاشة النتيجة ───────────────────────────────────────────
     if (phase == "done") {
         Box(
             modifier = Modifier.fillMaxSize().background(Color(0xFFF5F7FA)),
@@ -293,6 +294,7 @@ fun CalibrationScreen(
         return
     }
 
+    // ─── شاشة المعايرة ──────────────────────────────────────────
     Box(modifier = Modifier.fillMaxSize()) {
         AndroidView(factory = { mapView }, modifier = Modifier.fillMaxSize())
 
@@ -333,6 +335,7 @@ fun CalibrationScreen(
         ) {
             when (phase) {
 
+                // ─── idle ────────────────────────────────────────
                 "idle" -> Column(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
@@ -384,6 +387,7 @@ fun CalibrationScreen(
                     }
                 }
 
+                // ─── going ───────────────────────────────────────
                 "going" -> Button(
                     onClick = {
                         val rawPts = LocationForegroundService.calibrationPoints.toList()
@@ -403,6 +407,7 @@ fun CalibrationScreen(
                         goingPoints = cleanGeo
                         goingPolyline.setPoints(cleanGeo)
 
+                        // ─── رمز بداية الذهاب (🏠) ───────────────
                         cleanGeo.firstOrNull()?.let { first ->
                             Marker(mapView).also { m ->
                                 m.position = first
@@ -412,6 +417,7 @@ fun CalibrationScreen(
                                 m.showInfoWindow()
                             }
                         }
+                        // ─── رمز نهاية الذهاب (🚩) ───────────────
                         cleanGeo.lastOrNull()?.let { last ->
                             Marker(mapView).also { m ->
                                 m.position = last
@@ -448,6 +454,7 @@ fun CalibrationScreen(
                     )
                 }
 
+                // ─── going_done ──────────────────────────────────
                 "going_done" -> Button(
                     onClick = {
                         LocationForegroundService.calibrationPoints.clear()
@@ -468,6 +475,7 @@ fun CalibrationScreen(
                     )
                 }
 
+                // ─── returning ───────────────────────────────────
                 "returning" -> Button(
                     onClick = {
                         val rawPts = LocationForegroundService.calibrationPoints.toList()
@@ -486,6 +494,8 @@ fun CalibrationScreen(
                         saveRouteLocally(context, routeName, "returning", pointData)
                         returningPoints = cleanGeo
                         returningPolyline.setPoints(cleanGeo)
+
+                        // ─── رموز العودة محذوفة بالكامل ──────────
 
                         mapView.invalidate()
 
@@ -506,6 +516,7 @@ fun CalibrationScreen(
                     )
                 }
 
+                // ─── returning_done ──────────────────────────────
                 "returning_done" -> Button(
                     onClick = {
                         phase = "uploading"
@@ -563,6 +574,7 @@ fun CalibrationScreen(
                         )
                 }
 
+                // ─── uploading ───────────────────────────────────
                 "uploading" -> Box(
                     modifier = Modifier.fillMaxWidth(),
                     contentAlignment = Alignment.Center
