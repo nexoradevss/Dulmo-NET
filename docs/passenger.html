@@ -122,18 +122,15 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);min-height:100vh;color:
 /* ══ countdown bar ══ */
 .countdown-bar{
   display:none;
-  margin-bottom:8px;
-  padding:6px 8px;
-  background:#F8FAFC;
-  border:1px solid var(--border);
-  border-radius:9px;
+  background:rgba(0,0,0,0.25);
+  padding:5px 14px 7px;
 }
 .countdown-bar.show{display:block}
-.countdown-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}
-.countdown-label{font-size:12px;font-weight:700;color:var(--muted)}
-.countdown-time{font-size:13px;font-weight:700;color:var(--blue);font-variant-numeric:tabular-nums;letter-spacing:.5px}
-.countdown-track{background:#CFD8DC;border-radius:6px;height:6px;overflow:hidden}
-.countdown-fill{height:100%;width:100%;background:var(--blue-mid);border-radius:6px;transition:width 1s linear,background .5s}
+.countdown-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.countdown-label{font-size:11px;font-weight:700;color:rgba(255,255,255,0.85)}
+.countdown-time{font-size:12px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums;letter-spacing:.5px}
+.countdown-track{background:rgba(255,255,255,0.25);border-radius:6px;height:5px;overflow:hidden}
+.countdown-fill{height:100%;width:100%;background:#fff;border-radius:6px;transition:width 1s linear,background .5s}
 
 /* ══ expire toast ══ */
 .expire-toast{
@@ -150,16 +147,28 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);min-height:100vh;color:
 </head>
 <body>
 
-<div class="hdr">
-  <div class="hdr-logo">🚌</div>
-  <div class="hdr-title"><h1>Dolmuş NET</h1></div>
-  <select class="lang-select" id="langSelect" onchange="setLang(this.value)">
-    <option value="tr" selected>🇹🇷 TR</option>
-    <option value="en">🇬🇧 EN</option>
-    <option value="ar">🇸🇦 AR</option>
-  </select>
-  <button class="hdr-cancel-btn" id="cancelBtn" onclick="cancelSelection()">✖</button>
-  <button class="hdr-loc-btn" id="hdrLocBtn" onclick="getLocation()">📍 <span id="locBtnTxt">Konumumu Bul</span></button>
+<div style="background:var(--blue);">
+  <div class="hdr">
+    <div class="hdr-logo">🚌</div>
+    <div class="hdr-title"><h1>Dolmuş NET</h1></div>
+    <select class="lang-select" id="langSelect" onchange="setLang(this.value)">
+      <option value="tr" selected>🇹🇷 TR</option>
+      <option value="en">🇬🇧 EN</option>
+      <option value="ar">🇸🇦 AR</option>
+    </select>
+    <button class="hdr-cancel-btn" id="cancelBtn" onclick="cancelSelection()">✖</button>
+    <button class="hdr-loc-btn" id="hdrLocBtn" onclick="getLocation()">📍 <span id="locBtnTxt">Konumumu Bul</span></button>
+  </div>
+  <!-- ══ شريط العداد تحت الهيدر مباشرة ══ -->
+  <div class="countdown-bar" id="countdownBar">
+    <div class="countdown-top">
+      <span class="countdown-label" id="countdownLabel">⏱️ طلبك ينتهي بعد:</span>
+      <span class="countdown-time" id="countdownTime">15:00</span>
+    </div>
+    <div class="countdown-track">
+      <div class="countdown-fill" id="countdownFill"></div>
+    </div>
+  </div>
 </div>
 
 <div class="expire-toast" id="expireToast"></div>
@@ -193,17 +202,6 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);min-height:100vh;color:
       <button class="refresh-btn" id="refreshBtn" onclick="loadBuses()">🔄 Yenile</button>
     </div>
     <div class="update-time" id="updateTime">🔄 10 sn'de bir yenileniyor</div>
-
-    <!-- ══ عداد الإلغاء التلقائي ══ -->
-    <div class="countdown-bar" id="countdownBar">
-      <div class="countdown-top">
-        <span class="countdown-label" id="countdownLabel">⏱️ طلبك ينتهي بعد:</span>
-        <span class="countdown-time" id="countdownTime">15:00</span>
-      </div>
-      <div class="countdown-track">
-        <div class="countdown-fill" id="countdownFill"></div>
-      </div>
-    </div>
 
     <div id="busesList"></div>
   </div>
@@ -403,11 +401,11 @@ function updateCountdownUI(){
   const fill = document.getElementById('countdownFill');
   fill.style.width = pct + '%';
   if(pct > 50){
-    fill.style.background = '#1E88E5';
+    fill.style.background = '#ffffff';
   } else if(pct > 20){
-    fill.style.background = '#E65100';
+    fill.style.background = '#FFB74D';
   } else {
-    fill.style.background = '#C62828';
+    fill.style.background = '#EF9A9A';
   }
 }
 
