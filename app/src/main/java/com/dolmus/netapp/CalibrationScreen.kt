@@ -104,6 +104,9 @@ fun CalibrationScreen(
     val scope      = rememberCoroutineScope()
     val driverCity = remember { getDriverCity(context) }
 
+    var startLabel      by remember { mutableStateOf("") }
+    var endLabel        by remember { mutableStateOf("") }
+
     var phase           by remember { mutableStateOf("idle") }
     var goingPoints     by remember { mutableStateOf<List<GeoPoint>>(emptyList()) }
     var returningPoints by remember { mutableStateOf<List<GeoPoint>>(emptyList()) }
@@ -128,6 +131,20 @@ fun CalibrationScreen(
         }
     }
     val currentMarker = remember { Marker(mapView) }
+
+    LaunchedEffect(Unit) {
+        if (CalibrationSession.hasPendingGoing(context)) {
+            startLabel  = CalibrationSession.getStartLabel(context)
+            endLabel    = CalibrationSession.getEndLabel(context)
+            val saved   = CalibrationSession.getGoingPoints(context)
+            val geoList = saved.map { GeoPoint(it.lat, it.lng) }
+            goingPoints = geoList
+            goingPolyline.setPoints(geoList)
+            mapView.invalidate()
+            phase         = "going_done"
+            statusMessage = "تم استرجاع خط الذهاب — ابدأ تسجيل العودة"
+        }
+    }
 
     DisposableEffect(Unit) {
         Configuration.getInstance().userAgentValue = context.packageName
@@ -251,7 +268,6 @@ fun CalibrationScreen(
                         )
                     }
                 }
-                // ─── زر ابدأ العمل ──────────────────────────────
                 Button(
                     onClick = { onStartWork() },
                     modifier = Modifier.fillMaxWidth().height(56.dp),
@@ -319,21 +335,59 @@ fun CalibrationScreen(
         ) {
             when (phase) {
 
-                "idle" -> Button(
-                    onClick = {
-                        LocationForegroundService.calibrationPoints.clear()
-                        val i = Intent(context, LocationForegroundService::class.java).apply {
-                            action = LocationForegroundService.ACTION_START_CALIBRATION
-                        }
-                        context.startForegroundService(i)
-                        phase = "going"
-                        statusMessage = when(lang) { "tr" -> "Gidiş kaydediliyor..."; "en" -> "Recording going..."; else -> "جاري تسجيل خط الذهاب..." }
-                    },
-                    modifier = Modifier.fillMaxWidth().height(52.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E88E5))
-                ) { Text(when(lang) { "tr" -> "Gidişi Başlat"; "en" -> "Start Going"; else -> "ابدأ خط الذهاب" }, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp) }
+                // ─── idle ────────────────────────────────────────
+                "idle" -> Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    OutlinedTextField(
+                        value = startLabel,
+                        onValueChange = { startLabel = it },
+                        label = { Text(when(lang) { "tr" -> "Başlangıç Noktası"; "en" -> "Start Point"; else -> "نقطة البداية" }) },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor    = Color.Black,
+                            unfocusedTextColor  = Color.Black,
+                            focusedLabelColor   = Color(0xFF1E88E5),
+                            unfocusedLabelColor = Color.Gray
+                        )
+                    )
+                    OutlinedTextField(
+                        value = endLabel,
+                        onValueChange = { endLabel = it },
+                        label = { Text(when(lang) { "tr" -> "Bitiş Noktası"; "en" -> "End Point"; else -> "نقطة النهاية" }) },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor    = Color.Black,
+                            unfocusedTextColor  = Color.Black,
+                            focusedLabelColor   = Color(0xFF1E88E5),
+                            unfocusedLabelColor = Color.Gray
+                        )
+                    )
+                    Button(
+                        onClick = {
+                            CalibrationSession.saveHeader(context, routeName, startLabel, endLabel)
+                            LocationForegroundService.calibrationPoints.clear()
+                            val i = Intent(context, LocationForegroundService::class.java).apply {
+                                action = LocationForegroundService.ACTION_START_CALIBRATION
+                            }
+                            context.startForegroundService(i)
+                            phase = "going"
+                            statusMessage = when(lang) { "tr" -> "Gidiş kaydediliyor..."; "en" -> "Recording going..."; else -> "جاري تسجيل خط الذهاب..." }
+                        },
+                        modifier = Modifier.fillMaxWidth().height(52.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E88E5))
+                    ) {
+                        Text(
+                            when(lang) { "tr" -> "Gidişi Başlat"; "en" -> "Start Going"; else -> "ابدأ خط الذهاب" },
+                            color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp
+                        )
+                    }
+                }
 
+                // ─── going ───────────────────────────────────────
                 "going" -> Button(
                     onClick = {
                         val rawPts = LocationForegroundService.calibrationPoints.toList()
@@ -353,19 +407,21 @@ fun CalibrationScreen(
                         goingPoints = cleanGeo
                         goingPolyline.setPoints(cleanGeo)
 
+                        // ─── رمز بداية الذهاب (🏠) ───────────────
                         cleanGeo.firstOrNull()?.let { first ->
                             Marker(mapView).also { m ->
                                 m.position = first
-                                m.title = "🚌 $routeName — ${when(lang) { "tr" -> "Başlangıç"; "en" -> "Start"; else -> "بداية الذهاب" }}"
+                                m.title = if (startLabel.isNotBlank()) "🟢 $startLabel" else "🚌 ${when(lang) { "tr" -> "Başlangıç"; "en" -> "Start"; else -> "بداية الذهاب" }}"
                                 m.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
                                 mapView.overlays.add(m)
                                 m.showInfoWindow()
                             }
                         }
+                        // ─── رمز نهاية الذهاب (🚩) ───────────────
                         cleanGeo.lastOrNull()?.let { last ->
                             Marker(mapView).also { m ->
                                 m.position = last
-                                m.title = when(lang) { "tr" -> "Gidiş Sonu"; "en" -> "Going End"; else -> "🔵 نهاية الذهاب" }
+                                m.title = if (endLabel.isNotBlank()) "🔴 $endLabel" else "🔵 ${when(lang) { "tr" -> "Gidiş Sonu"; "en" -> "Going End"; else -> "نهاية الذهاب" }}"
                                 m.snippet = routeName
                                 m.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
                                 mapView.overlays.add(m)
@@ -378,14 +434,27 @@ fun CalibrationScreen(
                             action = LocationForegroundService.ACTION_PAUSE_SAVING
                         }
                         context.startService(pauseIntent)
+
+                        CalibrationSession.saveHeader(context, routeName, startLabel, endLabel)
+                        CalibrationSession.saveGoingPoints(
+                            context,
+                            cleanGeo.map { CalibrationSession.SavedPoint(it.latitude, it.longitude) }
+                        )
+
                         phase = "going_done"
                         statusMessage = when(lang) { "tr" -> "Gidiş tamamlandı."; "en" -> "Going done."; else -> "اكتمل خط الذهاب. ابدأ خط العودة." }
                     },
                     modifier = Modifier.fillMaxWidth().height(52.dp),
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE53935))
-                ) { Text(when(lang) { "tr" -> "Gidiş Bitti"; "en" -> "End Going"; else -> "انتهى خط الذهاب" }, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp) }
+                ) {
+                    Text(
+                        when(lang) { "tr" -> "Gidiş Bitti"; "en" -> "End Going"; else -> "انتهى خط الذهاب" },
+                        color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp
+                    )
+                }
 
+                // ─── going_done ──────────────────────────────────
                 "going_done" -> Button(
                     onClick = {
                         LocationForegroundService.calibrationPoints.clear()
@@ -399,8 +468,14 @@ fun CalibrationScreen(
                     modifier = Modifier.fillMaxWidth().height(52.dp),
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF43A047))
-                ) { Text(when(lang) { "tr" -> "Dönüşü Başlat"; "en" -> "Start Return"; else -> "ابدأ خط العودة" }, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp) }
+                ) {
+                    Text(
+                        when(lang) { "tr" -> "Dönüşü Başlat"; "en" -> "Start Return"; else -> "ابدأ خط العودة" },
+                        color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp
+                    )
+                }
 
+                // ─── returning ───────────────────────────────────
                 "returning" -> Button(
                     onClick = {
                         val rawPts = LocationForegroundService.calibrationPoints.toList()
@@ -420,25 +495,8 @@ fun CalibrationScreen(
                         returningPoints = cleanGeo
                         returningPolyline.setPoints(cleanGeo)
 
-                        cleanGeo.firstOrNull()?.let { first ->
-                            Marker(mapView).also { m ->
-                                m.position = first
-                                m.title = "🔄 $routeName — ${when(lang) { "tr" -> "Dönüş Başlangıcı"; "en" -> "Return Start"; else -> "بداية العودة" }}"
-                                m.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                                mapView.overlays.add(m)
-                                m.showInfoWindow()
-                            }
-                        }
-                        cleanGeo.lastOrNull()?.let { last ->
-                            Marker(mapView).also { m ->
-                                m.position = last
-                                m.title = when(lang) { "tr" -> "Dönüş Sonu"; "en" -> "Return End"; else -> "🔴 نهاية العودة" }
-                                m.snippet = routeName
-                                m.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                                mapView.overlays.add(m)
-                                m.showInfoWindow()
-                            }
-                        }
+                        // ─── رموز العودة محذوفة بالكامل ──────────
+
                         mapView.invalidate()
 
                         val pauseIntent = Intent(context, LocationForegroundService::class.java).apply {
@@ -451,8 +509,14 @@ fun CalibrationScreen(
                     modifier = Modifier.fillMaxWidth().height(52.dp),
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE53935))
-                ) { Text(when(lang) { "tr" -> "Dönüş Bitti"; "en" -> "End Return"; else -> "انتهى خط العودة" }, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp) }
+                ) {
+                    Text(
+                        when(lang) { "tr" -> "Dönüş Bitti"; "en" -> "End Return"; else -> "انتهى خط العودة" },
+                        color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp
+                    )
+                }
 
+                // ─── returning_done ──────────────────────────────
                 "returning_done" -> Button(
                     onClick = {
                         phase = "uploading"
@@ -484,6 +548,7 @@ fun CalibrationScreen(
                                     }
                                 )
                                 supabase.postgrest["routes"].insert(listOf(goingData, returningData))
+                                CalibrationSession.clear(context)
                                 routeDistanceKm = calculateRouteDistance(goingPoints) + calculateRouteDistance(returningPoints)
                                 phase = "done"
                                 statusMessage = ""
@@ -503,13 +568,26 @@ fun CalibrationScreen(
                     if (isUploading)
                         CircularProgressIndicator(modifier = Modifier.size(22.dp), color = Color.White)
                     else
-                        Text(when(lang) { "tr" -> "Kaydet ve Gönder"; "en" -> "Save & Upload"; else -> "حفظ وإرسال" }, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                        Text(
+                            when(lang) { "tr" -> "Kaydet ve Gönder"; "en" -> "Save & Upload"; else -> "حفظ وإرسال" },
+                            color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp
+                        )
                 }
 
-                "uploading" -> Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                // ─── uploading ───────────────────────────────────
+                "uploading" -> Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
                         CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color(0xFF1E88E5))
-                        Text(when(lang) { "tr" -> "Yükleniyor..."; "en" -> "Uploading..."; else -> "جاري الرفع..." }, color = Color(0xFF1E88E5))
+                        Text(
+                            when(lang) { "tr" -> "Yükleniyor..."; "en" -> "Uploading..."; else -> "جاري الرفع..." },
+                            color = Color(0xFF1E88E5)
+                        )
                     }
                 }
             }
