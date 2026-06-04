@@ -122,8 +122,12 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);min-height:100vh;color:
 /* ══ countdown bar ══ */
 .countdown-bar{
   display:none;
-  background:rgba(0,0,0,0.25);
+  background:#1565C0;
   padding:5px 14px 7px;
+  position:sticky;
+  top:0;
+  z-index:999;
+  border-top:1px solid rgba(255,255,255,0.15);
 }
 .countdown-bar.show{display:block}
 .countdown-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
@@ -147,7 +151,7 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);min-height:100vh;color:
 </head>
 <body>
 
-<div style="background:var(--blue);">
+<div style="background:var(--blue);position:sticky;top:0;z-index:1000;">
   <div class="hdr">
     <div class="hdr-logo">🚌</div>
     <div class="hdr-title"><h1>Dolmuş NET</h1></div>
