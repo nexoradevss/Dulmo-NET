@@ -81,7 +81,6 @@ fun loadRouteLocally(context: Context, routeName: String, direction: String): Li
     }
 }
 
-// ─── أيقونة محطة البداية / النهاية ──────────────────────────────
 fun createStopIcon(
     context: Context,
     emoji: String,
@@ -116,7 +115,6 @@ fun createStopIcon(
     return android.graphics.drawable.BitmapDrawable(context.resources, bitmap)
 }
 
-// ─── أيقونة حافلتك ───────────────────────────────────────────────
 fun createBusIcon(
     context: Context,
     driverName: String = "",
@@ -160,7 +158,6 @@ fun createBusIcon(
     return android.graphics.drawable.BitmapDrawable(context.resources, bitmap)
 }
 
-// ─── أيقونة حافلة سائق آخر ───────────────────────────────────────
 fun createOtherBusIcon(
     context: Context,
     driverName: String,
@@ -199,7 +196,6 @@ fun createOtherBusIcon(
     return android.graphics.drawable.BitmapDrawable(context.resources, bitmap)
 }
 
-// ─── أيقونة الراكب ───────────────────────────────────────────────
 fun createPassengerIcon(context: Context): android.graphics.drawable.BitmapDrawable {
     val size   = 80
     val bitmap = android.graphics.Bitmap.createBitmap(size, size, android.graphics.Bitmap.Config.ARGB_8888)
@@ -213,6 +209,7 @@ fun createPassengerIcon(context: Context): android.graphics.drawable.BitmapDrawa
     return android.graphics.drawable.BitmapDrawable(context.resources, bitmap)
 }
 
+// ✅ التعديل هنا: إضافة حذف markers المكررة قبل الرسم
 fun drawRouteOnMap(
     mapView: MapView,
     points: List<PointData>,
@@ -221,6 +218,11 @@ fun drawRouteOnMap(
     endTitle: String
 ) {
     if (points.isEmpty()) return
+
+    val toRemove = mapView.overlays.filterIsInstance<Marker>()
+        .filter { it.title == startTitle || it.title == endTitle }
+    mapView.overlays.removeAll(toRemove)
+
     val geoPoints = points.map { GeoPoint(it.lat, it.lng) }
     polyline.setPoints(geoPoints)
     Marker(mapView).also { m ->
@@ -292,50 +294,52 @@ fun LiveMapScreen(lang: String, routeName: String, onEndWork: (WorkReport) -> Un
         }
     }
 
-    // ─── جلب المسار من Supabase إذا لم يوجد محلياً ───────────────
+    // ✅ التعديل هنا: إضافة return@LaunchedEffect إذا المسار موجود محلياً
     LaunchedEffect(routeName) {
         val localGoing     = loadRouteLocally(context, routeName, "going")
         val localReturning = loadRouteLocally(context, routeName, "returning")
 
-        if (localGoing.isEmpty() || localReturning.isEmpty()) {
-            try {
-                val results = supabase.postgrest["routes"]
-                    .select { filter { eq("route_name", routeName) } }
-                    .decodeList<RouteData>()
+        if (localGoing.isNotEmpty() && localReturning.isNotEmpty()) {
+            routeLoadStatus = "G:${localGoing.size} R:${localReturning.size}"
+            return@LaunchedEffect
+        }
 
-                val going     = results.firstOrNull { it.direction == "going" }
-                val returning = results.firstOrNull { it.direction == "returning" }
+        try {
+            val results = supabase.postgrest["routes"]
+                .select { filter { eq("route_name", routeName) } }
+                .decodeList<RouteData>()
 
-                val savedStart = CalibrationSession.getStartLabel(context)
-                val savedEnd   = CalibrationSession.getEndLabel(context)
+            val going     = results.firstOrNull { it.direction == "going" }
+            val returning = results.firstOrNull { it.direction == "returning" }
 
-                going?.let {
-                    if (it.points.isNotEmpty()) {
-                        drawRouteOnMap(mapView, it.points, goingPolyline,
-                            if (savedStart.isNotBlank()) savedStart else when(lang) { "tr" -> "Gidiş Başlangıç"; "en" -> "Going Start"; else -> "بداية الذهاب" },
-                            if (savedEnd.isNotBlank())   savedEnd   else when(lang) { "tr" -> "Gidiş Sonu"; "en" -> "Going End"; else -> "نهاية الذهاب" }
-                        )
-                        saveRouteLocally(context, routeName, "going", it.points)
-                    }
+            val savedStart = CalibrationSession.getStartLabel(context)
+            val savedEnd   = CalibrationSession.getEndLabel(context)
+
+            going?.let {
+                if (it.points.isNotEmpty()) {
+                    drawRouteOnMap(mapView, it.points, goingPolyline,
+                        if (savedStart.isNotBlank()) savedStart else when(lang) { "tr" -> "Gidiş Başlangıç"; "en" -> "Going Start"; else -> "بداية الذهاب" },
+                        if (savedEnd.isNotBlank())   savedEnd   else when(lang) { "tr" -> "Gidiş Sonu"; "en" -> "Going End"; else -> "نهاية الذهاب" }
+                    )
+                    saveRouteLocally(context, routeName, "going", it.points)
                 }
-                returning?.let {
-                    if (it.points.isNotEmpty()) {
-                        drawRouteOnMap(mapView, it.points, returningPolyline,
-                            if (savedEnd.isNotBlank())   savedEnd   else when(lang) { "tr" -> "Dönüş Başlangıç"; "en" -> "Return Start"; else -> "بداية العودة" },
-                            if (savedStart.isNotBlank()) savedStart else when(lang) { "tr" -> "Dönüş Sonu"; "en" -> "Return End"; else -> "نهاية العودة" }
-                        )
-                        saveRouteLocally(context, routeName, "returning", it.points)
-                    }
-                }
-                routeLoadStatus = "G:${going?.points?.size ?: 0} R:${returning?.points?.size ?: 0} ☁️"
-            } catch (e: Exception) {
-                Log.e("DOLMUS", "Supabase route fetch error: ${e.message}")
-                routeLoadStatus = "❌"
             }
+            returning?.let {
+                if (it.points.isNotEmpty()) {
+                    drawRouteOnMap(mapView, it.points, returningPolyline,
+                        if (savedEnd.isNotBlank())   savedEnd   else when(lang) { "tr" -> "Dönüş Başlangıç"; "en" -> "Return Start"; else -> "بداية العودة" },
+                        if (savedStart.isNotBlank()) savedStart else when(lang) { "tr" -> "Dönüş Sonu"; "en" -> "Return End"; else -> "نهاية العودة" }
+                    )
+                    saveRouteLocally(context, routeName, "returning", it.points)
+                }
+            }
+            routeLoadStatus = "G:${going?.points?.size ?: 0} R:${returning?.points?.size ?: 0} ☁️"
+        } catch (e: Exception) {
+            Log.e("DOLMUS", "Supabase route fetch error: ${e.message}")
+            routeLoadStatus = "❌"
         }
     }
 
-    // ─── جلب الحافلات الأخرى كل 5 ثوانٍ ────────────────────────
     LaunchedEffect(routeName) {
         while (true) {
             try {
@@ -379,7 +383,6 @@ fun LiveMapScreen(lang: String, routeName: String, onEndWork: (WorkReport) -> Un
         }
     }
 
-    // ─── جلب الركاب كل 10 ثوانٍ ─────────────────────────────────
     LaunchedEffect(routeName) {
         while (true) {
             try {
@@ -431,7 +434,6 @@ fun LiveMapScreen(lang: String, routeName: String, onEndWork: (WorkReport) -> Un
         val goingPoints     = loadRouteLocally(context, routeName, "going")
         val returningPoints = loadRouteLocally(context, routeName, "returning")
 
-        // ─── أسماء المحطات المحفوظة ──────────────────────────────
         val savedStart = CalibrationSession.getStartLabel(context)
         val savedEnd   = CalibrationSession.getEndLabel(context)
 
