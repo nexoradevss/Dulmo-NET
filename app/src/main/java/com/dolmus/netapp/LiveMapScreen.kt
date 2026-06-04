@@ -297,7 +297,8 @@ fun LiveMapScreen(lang: String, routeName: String, onEndWork: (WorkReport) -> Un
         val localGoing     = loadRouteLocally(context, routeName, "going")
         val localReturning = loadRouteLocally(context, routeName, "returning")
 
-        if (localGoing.isEmpty() || localReturning.isEmpty()) {
+        // ✅ التعديل الوحيد: || أصبحت &&
+        if (localGoing.isEmpty() && localReturning.isEmpty()) {
             try {
                 val results = supabase.postgrest["routes"]
                     .select { filter { eq("route_name", routeName) } }
