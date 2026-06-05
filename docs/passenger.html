@@ -474,10 +474,17 @@ function getLocation(){
   document.getElementById('locBtnTxt').textContent=T[lang].locating;
   if(!navigator.geolocation){btn.className='hdr-loc-btn err';document.getElementById('locBtnTxt').textContent=T[lang].locNo;return;}
   navigator.geolocation.getCurrentPosition(
-    pos=>{userLat=pos.coords.latitude;userLng=pos.coords.longitude;btn.className='hdr-loc-btn ok';document.getElementById('locBtnTxt').textContent=T[lang].locOk;initMap();},
-    ()=>{btn.className='hdr-loc-btn err';document.getElementById('locBtnTxt').textContent=T[lang].locErr;},
-    {enableHighAccuracy:true,timeout:12000}
-  );
+pos=>{
+  userLat=pos.coords.latitude;
+  userLng=pos.coords.longitude;
+  btn.className='hdr-loc-btn ok';
+  document.getElementById('locBtnTxt').textContent=T[lang].locOk;
+  initMap();
+  if(selectedRouteName) savePassengerLocation(userLat, userLng, selectedRouteName);
+},
+()=>{btn.className='hdr-loc-btn err';document.getElementById('locBtnTxt').textContent=T[lang].locErr;},
+{enableHighAccuracy:true,timeout:12000}
+);
 }
 
 function initMap(){
