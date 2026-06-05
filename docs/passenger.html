@@ -565,6 +565,7 @@ function selectRoute(rName,color){
   document.getElementById('busesTitle').innerHTML=T[lang].busTitle+' &mdash; <span style="color:'+selectedColor+';font-weight:700">'+escH(rName)+'</span>';
   document.getElementById('busesCard').classList.remove('hidden');
   document.getElementById('cancelBtn').classList.add('show');
+  console.log("userLat:", userLat, "userLng:", userLng);
   if(userLat&&userLng) savePassengerLocation(userLat,userLng,rName);
   clearInterval(busInterval);loadBuses();busInterval=setInterval(loadBuses,10000);
 
