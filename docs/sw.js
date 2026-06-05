@@ -1,4 +1,4 @@
-const CACHE = 'dolmusnet-v3';
+const CACHE = 'dolmusnet-v2';
 const FILES = [
   '/Dulmo-NET/passenger.html',
   '/Dulmo-NET/manifest.json'
