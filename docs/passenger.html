@@ -590,17 +590,17 @@ async function loadBuses(){
     const validBuses=(Array.isArray(buses)?buses:[]).filter(b=>{const la=parseFloat(b.lat),lo=parseFloat(b.lng);return !isNaN(la)&&!isNaN(lo)&&la!==0&&lo!==0;});
     if(!validBuses.length){list.innerHTML='<div class="empty"><div class="empty-e">😴</div>'+T[lang].noBuses+'</div>';return;}
 
-    if(userLat != null && userLng != null){
+  /*  if(userLat != null && userLng != null){
       const arrived = validBuses.some(b => {
         const la=parseFloat(b.lat), lo=parseFloat(b.lng);
-        return calcDist(userLat, userLng, la, lo) < ARRIVAL_RADIUS_M;
+        return calcDist(userLat, userLng, la, lo) < ARRIVAL_RADIUS_M;    **************************************************************
       });
       if(arrived){
         showToast(T[lang].toastArrived);
         setTimeout(() => cancelSelection(), 600);
         return;
       }
-    }
+   */ }
 
     validBuses.forEach(b=>{
       const la=parseFloat(b.lat),lo=parseFloat(b.lng);
