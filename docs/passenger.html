@@ -158,11 +158,12 @@ if('serviceWorker' in navigator){ navigator.serviceWorker.register('/Dulmo-NET/s
 const COLORS = ['#1E88E5','#E53935','#43A047','#FB8C00','#8E24AA','#00ACC1','#F4511E','#3949AB','#00897B','#D81B60'];
 const PASSENGER_TTL_MS = 15 * 60 * 1000;
 const ARRIVAL_RADIUS_M = 100;
+const ARRIVAL_COUNTDOWN_S = 180; // 3 دقائق
 
 const T = {
   tr:{locBtn:'Konumumu Bul',locating:'⏳ Belirleniyor...',locOk:'✅ Konum Alındı',locErr:'↩ Konum Alınamadı',locNo:'❌ GPS Desteklenmiyor',mapTitle:'🗺️ Hat Haritası',routeTitle:'🚌 Hat Seç',busTitle:'🚌 Aktif Otobüsler',loading:'Yükleniyor...',noRoutes:'Kayıtlı hat yok',noRouteErr:'Hat yükleme hatası',noBuses:'Bu hatta aktif otobüs yok',refresh:'🔄 Yenile',autoRefresh:"🔄 10 sn'de bir yenileniyor",lastUpdate:'Son güncelleme: ',going:'Gidiş',returning:'Dönüş',choose:'Seç',chosen:'✅ Seçildi',lineLabel:'Hat:',goStart:'Gidiş Başlangıç',goEnd:'Gidiş Sonu',retStart:'Dönüş Başlangıç',retEnd:'Dönüş Sonu',myLoc:'📍 Konumunuz',cancel:'✖ İptal',moving:'🟢 Aktif',connErr:'Bağlantı hatası',installBtn:'Ana Ekrana Ekle',installedBtn:'✅ Eklendi!',iosHint:'<b>Safari:</b> Paylaş 🔗 → <b>Ana Ekrana Ekle</b>',toastArrived:'🚌 Otobüs yaklaştı — talep iptal edildi',toastExpired:'⏱️ 15 dk geçti — talep iptal edildi',countdownLabel:'⏱️ Talebiniz sona eriyor:'},
   en:{locBtn:'Find My Location',locating:'⏳ Locating...',locOk:'✅ Location Found',locErr:'↩ Location Failed',locNo:'❌ GPS Not Supported',mapTitle:'🗺️ Route Map',routeTitle:'🚌 Select Route',busTitle:'🚌 Active Buses',loading:'Loading...',noRoutes:'No routes found',noRouteErr:'Route load error',noBuses:'No active buses on this route',refresh:'🔄 Refresh',autoRefresh:'🔄 Auto-refresh every 10s',lastUpdate:'Last update: ',going:'Going',returning:'Return',choose:'Select',chosen:'✅ Selected',lineLabel:'Route:',goStart:'Going Start',goEnd:'Going End',retStart:'Return Start',retEnd:'Return End',myLoc:'📍 Your Location',cancel:'✖ Cancel',moving:'🟢 Active',connErr:'Connection error',installBtn:'Add to Home Screen',installedBtn:'✅ Added!',iosHint:'<b>Safari:</b> Share 🔗 → <b>Add to Home Screen</b>',toastArrived:'🚌 Bus arrived — request cancelled',toastExpired:'⏱️ 15 min passed — request cancelled',countdownLabel:'⏱️ Request expires in:'},
-  ar:{locBtn:'تحديد موقعي',locating:'⏳ جاري التحديد...',locOk:'✅ تم تحديد موقعك',locErr:'↩ تعذّر التحديد',locNo:'❌ GPS غير مدعوم',mapTitle:'🗺️ خريطة المسارات',routeTitle:'🚌 اختر الخط',busTitle:'🚌 الحافلات الفعالة',loading:'جاري التحميل...',noRoutes:'لا توجد خطوط محفوظة',noRouteErr:'خطأ في تحميل الخطوط',noBuses:'لا توجد حافلات فعالة على هذا الخط الآن',refresh:'🔄 تحديث',autoRefresh:'🔄 تحديث تلقائي كل 10 ثوانٍ',lastUpdate:'آخر تحديث: ',going:'ذهاب',returning:'عودة',choose:'اختر',chosen:'✅ محدد',lineLabel:'الخط:',goStart:'بداية الذهاب',goEnd:'نهاية الذهاب',retStart:'بداية العودة',retEnd:'نهاية العودة',myLoc:'📍 موقعك الحالي',cancel:'✖ إلغاء',moving:'🟢 متحرك',connErr:'خطأ في الاتصال',installBtn:'أضف إلى الشاشة الرئيسية',installedBtn:'✅ تمت الإضافة!',iosHint:'<b>Safari:</b> زر المشاركة 🔗 ← <b>إضافة إلى الشاشة الرئيسية</b>',toastArrived:'🚌 اقتربت الحافلة — تم إلغاء الطلب',toastExpired:'⏱️ انتهت 15 دقيقة — تم إلغاء الطلب',countdownLabel:'⏱️ طلبك ينتهي بعد:'}
+  ar:{locBtn:'تحديد موقعي',locating:'⏳ جاري التحديد...',locOk:'✅ تم تحديد موقعك',locErr:'↩ تعذّر التحديد',locNo:'❌ GPS غير مدعوم',mapTitle:'🗺️ خريطة المسارات',routeTitle:'🚌 اختر الخط',busTitle:'🚌 الحافلات الفعالة',loading:'جاري التحميل...',noRoutes:'لا توجد خطوط محفوظة',noRouteErr:'خطأ في تحميل الخطوط',noBuses:'لا توجد حافلات فعالة على هذا الخط الآن',refresh:'🔄 تحديث',autoRefresh:'🔄 تحديث تلقائي كل 10 ثوانٍ',lastUpdate:'آخر تحديث: ',going:'ذهاب',returning:'عودة',choose:'اختر',chosen:'✅ محدد',lineLabel:'الخط:',goStart:'بداية الذهاب',goEnd:'نهاية الذهاب',retStart:'بداية العودة',retEnd:'نهاية العودة',myLoc:'📍 موقعك الحالي',cancel:'✖ إلغاء',moving:'🟢 متحرك',connErr:'خطأ في الاتصال',installBtn:'أضف إلى الشاشة الرئيسية',installedBtn:'✅ تمت الإضافة!',iosHint:'<b>Safari:</b> زر المشاركة 🔗 ← <b>إضافة إلى الشاشة الرئيسية</b>',toastArrived:'🚌 اقتربت الحافلة — سيُلغى الطلب خلال 3 دقائق',toastExpired:'⏱️ انتهت 15 دقيقة — تم إلغاء الطلب',countdownLabel:'⏱️ طلبك ينتهي بعد:'}
 };
 
 let lang='tr';
@@ -240,6 +241,10 @@ let autoExpireTimeout=null;
 let countdownInterval=null;
 let countdownRemaining=0;
 
+// ══ متغيرات عداد الوصول ══
+let arrivalCountdownTimeout=null;
+let arrivalWarningShown=false;
+
 function showToast(msg){
   const t=document.getElementById('expireToast');
   t.textContent=msg;t.classList.add('show');
@@ -312,6 +317,8 @@ async function deletePassengerLocation(){
 
 async function cancelSelection(){
   clearTimeout(autoExpireTimeout);autoExpireTimeout=null;
+  clearTimeout(arrivalCountdownTimeout);arrivalCountdownTimeout=null;
+  arrivalWarningShown=false;
   stopCountdown();
   await deletePassengerLocation();
   selectedRouteName=null;clearInterval(busInterval);
@@ -452,10 +459,35 @@ async function loadBuses(){
     document.getElementById('updateTime').textContent=T[lang].lastUpdate+nowTime()+' 🔄';
     const validBuses=(Array.isArray(buses)?buses:[]).filter(b=>{const la=parseFloat(b.lat),lo=parseFloat(b.lng);return !isNaN(la)&&!isNaN(lo)&&la!==0&&lo!==0;});
     if(!validBuses.length){list.innerHTML='<div class="empty"><div class="empty-e">😴</div>'+T[lang].noBuses+'</div>';return;}
+
+    // ══ منطق عداد الوصول ══
     if(userLat!=null&&userLng!=null){
-      const arrived=validBuses.some(b=>{const la=parseFloat(b.lat),lo=parseFloat(b.lng);return calcDist(userLat,userLng,la,lo)<ARRIVAL_RADIUS_M;});
-      if(arrived){showToast(T[lang].toastArrived);setTimeout(()=>cancelSelection(),600);return;}
+      const arrived=validBuses.some(b=>{
+        const la=parseFloat(b.lat),lo=parseFloat(b.lng);
+        return calcDist(userLat,userLng,la,lo)<ARRIVAL_RADIUS_M;
+      });
+      if(arrived && !arrivalWarningShown){
+        arrivalWarningShown=true;
+        showToast(T[lang].toastArrived);
+        // أوقف عداد الـ 15 دقيقة وابدأ عداد 3 دقائق
+        clearTimeout(autoExpireTimeout);autoExpireTimeout=null;
+        startCountdown(ARRIVAL_COUNTDOWN_S);
+        arrivalCountdownTimeout=setTimeout(()=>{
+          cancelSelection();
+        },ARRIVAL_COUNTDOWN_S*1000);
+      }
+      if(!arrived && arrivalWarningShown){
+        // الحافلة ابتعدت — ألغِ عداد الوصول وأعد عداد الـ 15 دقيقة
+        arrivalWarningShown=false;
+        clearTimeout(arrivalCountdownTimeout);arrivalCountdownTimeout=null;
+        startCountdown(countdownRemaining);
+        autoExpireTimeout=setTimeout(()=>{
+          showToast(T[lang].toastExpired);
+          cancelSelection();
+        },countdownRemaining*1000);
+      }
     }
+
     validBuses.forEach(b=>{
       const la=parseFloat(b.lat),lo=parseFloat(b.lng);
       const bIcon=L.divIcon({className:'bus-marker-icon',html:`<div style="display:flex;flex-direction:column;align-items:center;gap:2px"><div style="font-size:30px;line-height:1;filter:drop-shadow(0 2px 5px rgba(0,0,0,.5))">🚌</div><div style="background:#1565C0;color:#fff;font-family:Cairo,sans-serif;padding:3px 10px;border-radius:8px;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,.4);text-align:center;line-height:1.5;border:1.5px solid rgba(255,255,255,.5)"><div style="font-size:12px;font-weight:700">${escH(b.driver_name)}</div><div style="font-size:11px;font-weight:600;opacity:.9">${escH(b.route_name)}</div></div></div>`,iconSize:[130,72],iconAnchor:[65,34]});
@@ -476,6 +508,7 @@ async function loadBuses(){
 
 window.addEventListener('beforeunload',()=>{
   clearTimeout(autoExpireTimeout);
+  clearTimeout(arrivalCountdownTimeout);
   clearInterval(countdownInterval);
   deletePassengerLocation();
 });
