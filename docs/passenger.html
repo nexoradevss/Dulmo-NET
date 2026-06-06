@@ -158,7 +158,8 @@ if('serviceWorker' in navigator){ navigator.serviceWorker.register('/Dulmo-NET/s
 const COLORS = ['#1E88E5','#E53935','#43A047','#FB8C00','#8E24AA','#00ACC1','#F4511E','#3949AB','#00897B','#D81B60'];
 const PASSENGER_TTL_MS = 15 * 60 * 1000;
 const ARRIVAL_RADIUS_M = 100;
-const ARRIVAL_COUNTDOWN_S = 100; // 1 دقائق
+const ARRIVAL_COUNTDOWN_S = 100;
+const PING_INTERVAL_MS = 270000; // ping كل 4 دقيقة و30 ثانية
 
 const T = {
   tr:{locBtn:'Konumumu Bul',locating:'⏳ Belirleniyor...',locOk:'✅ Konum Alındı',locErr:'↩ Konum Alınamadı',locNo:'❌ GPS Desteklenmiyor',mapTitle:'🗺️ Hat Haritası',routeTitle:'🚌 Hat Seç',busTitle:'🚌 Aktif Otobüsler',loading:'Yükleniyor...',noRoutes:'Kayıtlı hat yok',noRouteErr:'Hat yükleme hatası',noBuses:'Bu hatta aktif otobüs yok',refresh:'🔄 Yenile',autoRefresh:"🔄 10 sn'de bir yenileniyor",lastUpdate:'Son güncelleme: ',going:'Gidiş',returning:'Dönüş',choose:'Seç',chosen:'✅ Seçildi',lineLabel:'Hat:',goStart:'Gidiş Başlangıç',goEnd:'Gidiş Sonu',retStart:'Dönüş Başlangıç',retEnd:'Dönüş Sonu',myLoc:'📍 Konumunuz',cancel:'✖ İptal',moving:'🟢 Aktif',connErr:'Bağlantı hatası',installBtn:'Ana Ekrana Ekle',installedBtn:'✅ Eklendi!',iosHint:'<b>Safari:</b> Paylaş 🔗 → <b>Ana Ekrana Ekle</b>',toastArrived:'🚌 Otobüs yaklaştı — talep iptal edildi',toastExpired:'⏱️ 15 dk geçti — talep iptal edildi',countdownLabel:'⏱️ Talebiniz sona eriyor:'},
@@ -245,6 +246,9 @@ let countdownRemaining=0;
 let arrivalCountdownTimeout=null;
 let arrivalWarningShown=false;
 
+// ══ متغير الـ ping ══
+let pingInterval=null;
+
 function showToast(msg){
   const t=document.getElementById('expireToast');
   t.textContent=msg;t.classList.add('show');
@@ -315,11 +319,29 @@ async function deletePassengerLocation(){
   }catch(e){console.error(e);}
 }
 
+// ══ بدء الـ ping ══
+function startPing(routeName){
+  clearInterval(pingInterval);
+  pingInterval=setInterval(()=>{
+    if(selectedRouteName && userLat!=null && userLng!=null){
+      savePassengerLocation(userLat,userLng,selectedRouteName);
+      console.log('ping sent at',nowTime());
+    }
+  },PING_INTERVAL_MS);
+}
+
+// ══ إيقاف الـ ping ══
+function stopPing(){
+  clearInterval(pingInterval);
+  pingInterval=null;
+}
+
 async function cancelSelection(){
   clearTimeout(autoExpireTimeout);autoExpireTimeout=null;
   clearTimeout(arrivalCountdownTimeout);arrivalCountdownTimeout=null;
   arrivalWarningShown=false;
   stopCountdown();
+  stopPing();
   await deletePassengerLocation();
   selectedRouteName=null;clearInterval(busInterval);
   document.getElementById('busesCard').classList.add('hidden');
@@ -446,6 +468,8 @@ function selectRoute(rName,color){
     showToast(T[lang].toastExpired);
     cancelSelection();
   },PASSENGER_TTL_MS);
+  // ══ ابدأ الـ ping ══
+  startPing(rName);
   setTimeout(()=>document.getElementById('busesCard').scrollIntoView({behavior:'smooth'}),300);
 }
 
@@ -469,7 +493,6 @@ async function loadBuses(){
       if(arrived && !arrivalWarningShown){
         arrivalWarningShown=true;
         showToast(T[lang].toastArrived);
-        // أوقف عداد الـ 15 دقيقة وابدأ عداد 3 دقائق
         clearTimeout(autoExpireTimeout);autoExpireTimeout=null;
         startCountdown(ARRIVAL_COUNTDOWN_S);
         arrivalCountdownTimeout=setTimeout(()=>{
@@ -477,7 +500,6 @@ async function loadBuses(){
         },ARRIVAL_COUNTDOWN_S*1000);
       }
       if(!arrived && arrivalWarningShown){
-        // الحافلة ابتعدت — ألغِ عداد الوصول وأعد عداد الـ 15 دقيقة
         arrivalWarningShown=false;
         clearTimeout(arrivalCountdownTimeout);arrivalCountdownTimeout=null;
         startCountdown(countdownRemaining);
@@ -510,6 +532,7 @@ window.addEventListener('beforeunload',()=>{
   clearTimeout(autoExpireTimeout);
   clearTimeout(arrivalCountdownTimeout);
   clearInterval(countdownInterval);
+  stopPing();
   deletePassengerLocation();
 });
 window.addEventListener('load',initAppCard);
