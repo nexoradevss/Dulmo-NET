@@ -1,165 +1,16 @@
-<!DOCTYPE html>
-<html id="htmlRoot" dir="ltr" lang="tr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#1565C0">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<title>Dolmuş NET</title>
-<link rel="manifest" href="/Dulmo-NET/manifest.json">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-<style>
-:root{
-  --blue:#1565C0;--blue-mid:#1E88E5;--blue-light:#E3F2FD;
-  --green:#2E7D32;--green-light:#E8F5E9;
-  --amber:#E65100;--amber-light:#FFF3E0;
-  --red:#C62828;--red-light:#FFEBEE;
-  --bg:#F0F4F8;--card:#fff;--border:#CFD8DC;
-  --text:#1A2332;--muted:#607D8B;
-  --r:14px;--shadow:0 2px 14px rgba(21,101,192,.1);
-}
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{font-family:'Cairo',sans-serif;background:var(--bg);min-height:100vh;color:var(--text)}
-.bus-marker-icon{background:transparent!important;border:none!important;}
-.hdr{background:var(--blue);padding:8px 14px;color:#fff;display:flex;align-items:center;gap:10px}
-.hdr-logo{font-size:20px}
-.hdr-title{flex:1}
-.hdr-title h1{font-size:16px;font-weight:700}
-.hdr-loc-btn{background:#FFA000;color:#fff;border:none;border-radius:10px;padding:6px 14px;font-family:'Cairo',sans-serif;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;white-space:nowrap;flex-shrink:0}
-.hdr-loc-btn.ok{background:#2E7D32}
-.hdr-loc-btn.loading{background:#E65100}
-.hdr-loc-btn.err{background:#C62828}
-.hdr-cancel-btn{background:rgba(255,255,255,0.2);color:#fff;border:1.5px solid rgba(255,255,255,0.5);border-radius:10px;padding:6px 12px;font-family:'Cairo',sans-serif;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;display:none}
-.hdr-cancel-btn.show{display:block}
-.lang-select{background:rgba(255,255,255,0.15);color:#fff;border:1.5px solid rgba(255,255,255,0.4);border-radius:8px;padding:4px 6px;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0;outline:none}
-.lang-select option{color:#1A2332;background:#fff}
-.wrap{max-width:520px;margin:0 auto;padding:0 10px 30px}
-.card{background:var(--card);border-radius:var(--r);padding:10px 12px;margin-bottom:8px;box-shadow:var(--shadow);border:1px solid var(--border)}
-.card-title{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:5px}
-#map{height:520px;border-radius:12px;border:1.5px solid var(--border);overflow:hidden;z-index:0}
-.routes-grid{display:flex;flex-direction:column;gap:5px}
-.route-btn{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:10px;border:1.5px solid var(--border);background:#fff;cursor:pointer;transition:.2s;width:100%;font-family:'Cairo',sans-serif}
-.route-btn:hover{border-color:var(--blue-mid);background:var(--blue-light)}
-.route-btn.active{border-color:var(--blue);background:var(--blue-light);box-shadow:0 0 0 3px rgba(30,136,229,.15)}
-.route-dot{width:14px;height:14px;border-radius:50%;flex-shrink:0}
-.route-btn-info{flex:1;text-align:right}
-.route-btn-name{font-size:13px;font-weight:700;color:var(--text)}
-.route-btn-meta{font-size:11px;color:var(--muted);margin-top:0}
-.route-badge{font-size:11px;font-weight:700;padding:3px 8px;border-radius:7px;white-space:nowrap;flex-shrink:0}
-.rb-active{background:var(--green-light);color:var(--green)}
-.rb-idle{background:#ECEFF1;color:var(--muted)}
-.bus-row{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--border);border-radius:11px;padding:7px 10px;margin-bottom:6px}
-.bus-icon{font-size:18px;flex-shrink:0}
-.bus-body{flex:1}
-.bus-name{font-size:14px;font-weight:700}
-.bus-meta{font-size:12px;color:var(--muted);margin-top:2px}
-.bus-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
-.bus-status{font-size:11px;font-weight:700;padding:3px 8px;border-radius:8px;white-space:nowrap}
-.bs-on{background:var(--green-light);color:var(--green)}
-.bus-dist{font-size:12px;font-weight:700;color:var(--blue)}
-.bus-eta{font-size:11px;color:var(--muted)}
-@keyframes spin{to{transform:rotate(360deg)}}
-.empty{text-align:center;padding:22px 10px;color:var(--muted);font-size:13px}
-.empty-e{font-size:28px;margin-bottom:6px}
-.refresh-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
-.refresh-btn{background:none;border:1.5px solid var(--border);border-radius:9px;padding:5px 11px;font-size:12px;font-family:'Cairo',sans-serif;color:var(--muted);cursor:pointer;transition:.2s}
-.refresh-btn:hover{border-color:var(--blue-mid);color:var(--blue)}
-.update-time{font-size:11px;color:var(--muted);margin-bottom:8px}
-.hidden{display:none!important}
-.direction-tab{display:inline-block;font-size:11px;padding:2px 8px;border-radius:6px;font-weight:700;margin-right:4px}
-.dir-go{background:#E3F2FD;color:#1565C0}
-.dir-back{background:#F3E5F5;color:#6A1B9A}
-.app-bar{background:linear-gradient(135deg,#1565C0 0%,#1E88E5 100%);padding:10px 14px;display:flex;align-items:center;gap:12px;margin-bottom:8px;border-radius:var(--r);box-shadow:var(--shadow);}
-.app-bar-qr{flex-shrink:0;background:#fff;border-radius:8px;padding:4px;width:56px;height:56px;display:flex;align-items:center;justify-content:center;}
-.app-bar-qr canvas,.app-bar-qr img{border-radius:4px;display:block}
-.install-btn{display:inline-flex;align-items:center;gap:7px;background:#fff;color:var(--blue);border:none;border-radius:10px;padding:12px 16px;font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,.18);white-space:nowrap;flex:1;justify-content:center;}
-.install-btn:hover{background:#E3F2FD;}
-.install-btn.installed{background:var(--green-light);color:var(--green);cursor:default}
-.ios-hint{display:none;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:10px;padding:6px 10px;font-size:11px;color:#fff;line-height:1.75;flex:1;}
-.ios-hint.show{display:block}
-.countdown-bar{display:none;background:#1565C0;padding:5px 14px 7px;position:sticky;top:0;z-index:999;border-top:1px solid rgba(255,255,255,0.15);}
-.countdown-bar.show{display:block}
-.countdown-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
-.countdown-label{font-size:11px;font-weight:700;color:rgba(255,255,255,0.85)}
-.countdown-time{font-size:12px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums;letter-spacing:.5px}
-.countdown-track{background:rgba(255,255,255,0.25);border-radius:6px;height:5px;overflow:hidden}
-.countdown-fill{height:100%;width:100%;background:#fff;border-radius:6px;transition:width 1s linear,background .5s}
-.expire-toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1A2332;color:#fff;padding:10px 20px;border-radius:12px;font-family:'Cairo',sans-serif;font-size:13px;font-weight:700;box-shadow:0 4px 20px rgba(0,0,0,.35);z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;}
-.expire-toast.show{opacity:1}
-</style>
-</head>
-<body>
-
-<div style="background:var(--blue);position:sticky;top:0;z-index:1000;">
-  <div class="hdr">
-    <div class="hdr-logo">🚌</div>
-    <div class="hdr-title"><h1>Dolmuş NET</h1></div>
-    <select class="lang-select" id="langSelect" onchange="setLang(this.value)">
-      <option value="tr" selected>🇹🇷 TR</option>
-      <option value="en">🇬🇧 EN</option>
-      <option value="ar">🇸🇦 AR</option>
-    </select>
-    <button class="hdr-cancel-btn" id="cancelBtn" onclick="cancelSelection()">✖</button>
-    <button class="hdr-loc-btn" id="hdrLocBtn" onclick="getLocation()">📍 <span id="locBtnTxt">Konumumu Bul</span></button>
-  </div>
-  <div class="countdown-bar" id="countdownBar">
-    <div class="countdown-top">
-      <span class="countdown-label" id="countdownLabel">⏱️ طلبك ينتهي بعد:</span>
-      <span class="countdown-time" id="countdownTime">15:00</span>
-    </div>
-    <div class="countdown-track">
-      <div class="countdown-fill" id="countdownFill"></div>
-    </div>
-  </div>
-</div>
-
-<div class="expire-toast" id="expireToast"></div>
-
-<div class="wrap">
-  <div class="app-bar" id="appBar">
-    <div class="app-bar-qr" id="qrBox"></div>
-    <button class="install-btn" id="installBtn" onclick="triggerInstall()">
-      <span id="installBtnIcon">➕</span>
-      <span id="installBtnTxt">Ana Ekrana Ekle</span>
-    </button>
-    <div class="ios-hint" id="iosHint"></div>
-  </div>
-
-  <div class="card" id="mapCard">
-    <div class="card-title" id="mapTitle">🗺️ Hat Haritası</div>
-    <div id="map"></div>
-  </div>
-
-  <div class="card hidden" id="routesCard">
-    <div class="card-title" id="routeTitle">🚌 Hat Seç</div>
-    <div class="routes-grid" id="routesGrid">
-      <div class="empty"><div class="empty-e">⏳</div><span id="loadingTxt">Yükleniyor...</span></div>
-    </div>
-  </div>
-
-  <div class="card hidden" id="busesCard">
-    <div class="refresh-row">
-      <div class="card-title" style="margin-bottom:0" id="busesTitle">🚌 Aktif Otobüsler</div>
-      <button class="refresh-btn" id="refreshBtn" onclick="loadBuses()">🔄 Yenile</button>
-    </div>
-    <div class="update-time" id="updateTime">🔄 10 sn'de bir yenileniyor</div>
-    <div id="busesList"></div>
-  </div>
-</div>
-
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script>
 const SB_URL = 'https://ezmvwhpmvuokrrvsohuv.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV6bXZ3aHBtdnVva3JydnNvaHV2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTcxNDQsImV4cCI6MjA5NDI3MzE0NH0.je77PXmfbjR9H7TWzVhpQ4Kt6mTRiI0UfS9pHQzpHhU';
+
 if('serviceWorker' in navigator){ navigator.serviceWorker.register('/Dulmo-NET/sw.js'); }
+
 const COLORS = ['#1E88E5','#E53935','#43A047','#FB8C00','#8E24AA','#00ACC1','#F4511E','#3949AB','#00897B','#D81B60'];
-const PASSENGER_TTL_MS = 15 * 60 * 1000;
-const ARRIVAL_RADIUS_M = 100;
+const PASSENGER_TTL_MS   = 15 * 60 * 1000; // 15 دقيقة
+const ARRIVAL_RADIUS_M   = 100;
 const ARRIVAL_COUNTDOWN_S = 100;
-const PING_INTERVAL_MS = 270000; // ping كل 4 دقيقة و30 ثانية
+const PING_INTERVAL_MS   = 30000; // ✅ heartbeat كل 30 ثانية
 
 const T = {
   tr:{locBtn:'Konumumu Bul',locating:'⏳ Belirleniyor...',locOk:'✅ Konum Alındı',locErr:'↩ Konum Alınamadı',locNo:'❌ GPS Desteklenmiyor',mapTitle:'🗺️ Hat Haritası',routeTitle:'🚌 Hat Seç',busTitle:'🚌 Aktif Otobüsler',loading:'Yükleniyor...',noRoutes:'Kayıtlı hat yok',noRouteErr:'Hat yükleme hatası',noBuses:'Bu hatta aktif otobüs yok',refresh:'🔄 Yenile',autoRefresh:"🔄 10 sn'de bir yenileniyor",lastUpdate:'Son güncelleme: ',going:'Gidiş',returning:'Dönüş',choose:'Seç',chosen:'✅ Seçildi',lineLabel:'Hat:',goStart:'Gidiş Başlangıç',goEnd:'Gidiş Sonu',retStart:'Dönüş Başlangıç',retEnd:'Dönüş Sonu',myLoc:'📍 Konumunuz',cancel:'✖ İptal',moving:'🟢 Aktif',connErr:'Bağlantı hatası',installBtn:'Ana Ekrana Ekle',installedBtn:'✅ Eklendi!',iosHint:'<b>Safari:</b> Paylaş 🔗 → <b>Ana Ekrana Ekle</b>',toastArrived:'🚌 Otobüs yaklaştı — talep iptal edildi',toastExpired:'⏱️ 15 dk geçti — talep iptal edildi',countdownLabel:'⏱️ Talebiniz sona eriyor:'},
@@ -241,13 +92,60 @@ let passengerId='p_'+Math.random().toString(36).substr(2,9);
 let autoExpireTimeout=null;
 let countdownInterval=null;
 let countdownRemaining=0;
-
-// ══ متغيرات عداد الوصول ══
 let arrivalCountdownTimeout=null;
 let arrivalWarningShown=false;
-
-// ══ متغير الـ ping ══
 let pingInterval=null;
+
+// ══════════════════════════════════════════
+// ✅ HEARTBEAT SYSTEM — النبضة كل 30 ثانية
+// ══════════════════════════════════════════
+
+function startPing(routeName){
+  stopPing(); // امسح القديم أولاً
+  pingInterval = setInterval(async () => {
+    if(selectedRouteName && userLat != null && userLng != null){
+      await savePassengerLocation(userLat, userLng, selectedRouteName);
+      console.log('💓 heartbeat sent at', nowTime());
+    }
+  }, PING_INTERVAL_MS);
+}
+
+function stopPing(){
+  clearInterval(pingInterval);
+  pingInterval = null;
+}
+
+// ══════════════════════════════════════════
+// ✅ BEACON — يُرسل عند إغلاق الصفحة
+// ══════════════════════════════════════════
+
+function sendBeaconDelete(){
+  // Beacon API — يعمل حتى بعد إغلاق الصفحة
+  const url = `${SB_URL}/rest/v1/passenger_locations?id=eq.${passengerId}`;
+  // نستخدم keepalive fetch كبديل أكثر دعماً من Beacon مع REST
+  try {
+    fetch(url, {
+      method: 'DELETE',
+      headers: {
+        apikey: SB_KEY,
+        Authorization: 'Bearer ' + SB_KEY
+      },
+      keepalive: true // ✅ هذا هو المفتاح — يبقى الطلب حياً بعد إغلاق الصفحة
+    });
+  } catch(e) {
+    // آخر محاولة بـ sendBeacon كـ fallback
+    try {
+      navigator.sendBeacon(
+        `${SB_URL}/rest/v1/rpc/delete_passenger`,
+        JSON.stringify({ p_id: passengerId })
+      );
+    } catch(e2) { /* صمت */ }
+  }
+}
+
+// ══════════════════════════════════════════
+// UTILITIES
+// ══════════════════════════════════════════
 
 function showToast(msg){
   const t=document.getElementById('expireToast');
@@ -303,38 +201,31 @@ async function savePassengerLocation(lat,lng,routeName){
   try{
     const res=await fetch(`${SB_URL}/rest/v1/passenger_locations`,{
       method:'POST',
-      headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'},
+      headers:{
+        apikey:SB_KEY,
+        Authorization:'Bearer '+SB_KEY,
+        'Content-Type':'application/json',
+        'Prefer':'resolution=merge-duplicates'
+      },
       body:JSON.stringify({id:passengerId,route_name:routeName||'',lat,lng})
     });
-    const data=await res.json();
-    console.log('savePassenger status:',res.status,data);
+    console.log('💾 saved passenger, status:', res.status);
   }catch(e){console.error('savePassenger error:',e);}
 }
 
 async function deletePassengerLocation(){
   try{
     await fetch(`${SB_URL}/rest/v1/passenger_locations?id=eq.${passengerId}`,{
-      method:'DELETE',headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY}
+      method:'DELETE',
+      headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY}
     });
+    console.log('🗑️ passenger deleted');
   }catch(e){console.error(e);}
 }
 
-// ══ بدء الـ ping ══
-function startPing(routeName){
-  clearInterval(pingInterval);
-  pingInterval=setInterval(()=>{
-    if(selectedRouteName && userLat!=null && userLng!=null){
-      savePassengerLocation(userLat,userLng,selectedRouteName);
-      console.log('ping sent at',nowTime());
-    }
-  },PING_INTERVAL_MS);
-}
-
-// ══ إيقاف الـ ping ══
-function stopPing(){
-  clearInterval(pingInterval);
-  pingInterval=null;
-}
+// ══════════════════════════════════════════
+// CANCEL SELECTION
+// ══════════════════════════════════════════
 
 async function cancelSelection(){
   clearTimeout(autoExpireTimeout);autoExpireTimeout=null;
@@ -343,7 +234,8 @@ async function cancelSelection(){
   stopCountdown();
   stopPing();
   await deletePassengerLocation();
-  selectedRouteName=null;clearInterval(busInterval);
+  selectedRouteName=null;
+  clearInterval(busInterval);
   document.getElementById('busesCard').classList.add('hidden');
   document.getElementById('cancelBtn').classList.remove('show');
   document.querySelectorAll('.route-btn').forEach(el=>el.classList.remove('active'));
@@ -468,8 +360,7 @@ function selectRoute(rName,color){
     showToast(T[lang].toastExpired);
     cancelSelection();
   },PASSENGER_TTL_MS);
-  // ══ ابدأ الـ ping ══
-  startPing(rName);
+  startPing(rName); // ✅ ابدأ الـ heartbeat
   setTimeout(()=>document.getElementById('busesCard').scrollIntoView({behavior:'smooth'}),300);
 }
 
@@ -484,7 +375,6 @@ async function loadBuses(){
     const validBuses=(Array.isArray(buses)?buses:[]).filter(b=>{const la=parseFloat(b.lat),lo=parseFloat(b.lng);return !isNaN(la)&&!isNaN(lo)&&la!==0&&lo!==0;});
     if(!validBuses.length){list.innerHTML='<div class="empty"><div class="empty-e">😴</div>'+T[lang].noBuses+'</div>';return;}
 
-    // ══ منطق عداد الوصول ══
     if(userLat!=null&&userLng!=null){
       const arrived=validBuses.some(b=>{
         const la=parseFloat(b.lat),lo=parseFloat(b.lng);
@@ -494,6 +384,7 @@ async function loadBuses(){
         arrivalWarningShown=true;
         showToast(T[lang].toastArrived);
         clearTimeout(autoExpireTimeout);autoExpireTimeout=null;
+        stopCountdown();
         startCountdown(ARRIVAL_COUNTDOWN_S);
         arrivalCountdownTimeout=setTimeout(()=>{
           cancelSelection();
@@ -528,14 +419,25 @@ async function loadBuses(){
   }
 }
 
-window.addEventListener('beforeunload',()=>{
+// ══════════════════════════════════════════
+// ✅ إغلاق الصفحة — طبقتان من الحماية
+// ══════════════════════════════════════════
+
+window.addEventListener('beforeunload', () => {
   clearTimeout(autoExpireTimeout);
   clearTimeout(arrivalCountdownTimeout);
   clearInterval(countdownInterval);
   stopPing();
-  deletePassengerLocation();
+  // ✅ keepalive fetch — يكمل حتى بعد إغلاق الصفحة
+  sendBeaconDelete();
 });
-window.addEventListener('load',initAppCard);
+
+// ✅ Page Visibility API — عندما يخفي المستخدم الصفحة (تبديل تطبيق، إغلاق تاب)
+document.addEventListener('visibilitychange', () => {
+  if(document.visibilityState === 'hidden' && selectedRouteName){
+    sendBeaconDelete();
+  }
+});
+
+window.addEventListener('load', initAppCard);
 </script>
-</body>
-</html>
