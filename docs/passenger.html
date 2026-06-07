@@ -79,6 +79,11 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);min-height:100vh;color:
 .install-btn.installed{background:var(--green-light);color:var(--green);cursor:default}
 .ios-hint{display:none;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:10px;padding:6px 10px;font-size:11px;color:#fff;line-height:1.75;flex:1;}
 .ios-hint.show{display:block}
+.qr-overlay{position:fixed;inset:0;background:rgba(0,0,0,.62);display:none;align-items:center;justify-content:center;z-index:2000;padding:20px;}
+.qr-overlay.show{display:flex;}
+.qr-modal{background:#fff;border-radius:18px;padding:20px;max-width:520px;width:100%;box-shadow:0 22px 60px rgba(0,0,0,.25);display:flex;flex-direction:column;align-items:center;gap:14px;}
+.qr-modal-box{padding:12px;border-radius:16px;border:1.5px solid var(--border);background:#f7f9fc;}
+.qr-modal-close{background:var(--blue);color:#fff;border:none;border-radius:12px;padding:10px 16px;font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;cursor:pointer;}
 .countdown-bar{display:none;background:#1565C0;padding:5px 14px 7px;position:sticky;top:0;z-index:999;border-top:1px solid rgba(255,255,255,0.15);}
 .countdown-bar.show{display:block}
 .countdown-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
@@ -116,6 +121,13 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);min-height:100vh;color:
 </div>
 
 <div class="expire-toast" id="expireToast"></div>
+
+<div class="qr-overlay" id="qrOverlay" onclick="closeQrOverlay()">
+  <div class="qr-modal" onclick="event.stopPropagation()">
+    <div id="qrModalBox" class="qr-modal-box"></div>
+    <button class="qr-modal-close" onclick="closeQrOverlay()">Close</button>
+  </div>
+</div>
 
 <div class="wrap">
   <div class="app-bar" id="appBar">
@@ -199,9 +211,28 @@ async function triggerInstall(){
 function generateQR(){
   const box=document.getElementById('qrBox');
   box.innerHTML='';
+  box.style.cursor='pointer';
+  box.onclick=showQrOverlay;
   const url=window.location.href.split('?')[0];
   try{new QRCode(box,{text:url,width:48,height:48,colorDark:'#1565C0',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});}
   catch(e){box.innerHTML='<div style="font-size:30px;line-height:48px;text-align:center">📱</div>';}
+  generateQRModal();
+}
+
+function generateQRModal(){
+  const box=document.getElementById('qrModalBox');
+  box.innerHTML='';
+  const url=window.location.href.split('?')[0];
+  try{new QRCode(box,{text:url,width:260,height:260,colorDark:'#1565C0',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});}
+  catch(e){box.innerHTML='<div style="font-size:48px;line-height:260px;text-align:center">📱</div>';}
+}
+
+function showQrOverlay(){
+  document.getElementById('qrOverlay').classList.add('show');
+}
+
+function closeQrOverlay(){
+  document.getElementById('qrOverlay').classList.remove('show');
 }
 
 function initAppCard(){
