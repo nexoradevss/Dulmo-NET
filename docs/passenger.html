@@ -261,7 +261,7 @@ function setLang(l){
   if(hdrBtn.classList.contains('ok'))document.getElementById('locBtnTxt').textContent=T[l].locOk;
   else if(hdrBtn.classList.contains('err'))document.getElementById('locBtnTxt').textContent=T[l].locErr;
   else if(hdrBtn.classList.contains('loading'))document.getElementById('locBtnTxt').textContent=T[l].locating;
-  if(selectedRouteName){document.getElementById('busesTitle').innerHTML=T[l].busTitle+' &mdash; <span style="color:'+selectedColor+';font-weight:700">'+escH(selectedRouteName)+'</span>';}
+  if(selectedRouteName){document.getElementById('busesTitle').innerHTML=T[l].busTitle+' &mdash; <span style="color:var(--text);font-weight:700">'+escH(selectedRouteName)+'</span>';}
   else{document.getElementById('busesTitle').textContent=T[l].busTitle;}
   if(map)loadRoutes();
 }
@@ -459,7 +459,7 @@ async function loadRoutes(){
       const pts=fs.points||[];
       if(pts.length>0){
         const mid=pts[Math.floor(pts.length/2)];
-        const lbl=L.divIcon({className:'',html:`<div style="background:${color};color:#fff;font-family:Cairo,sans-serif;font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;white-space:nowrap;box-shadow:0 1px 5px rgba(0,0,0,.3)">${escH(rName)}</div>`,iconAnchor:[30,10]});
+        const lbl=L.divIcon({className:'',html:`<div style="background:#fff;color:var(--text);border:1px solid ${color};font-family:Cairo,sans-serif;font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;white-space:nowrap;box-shadow:0 1px 5px rgba(0,0,0,.3)">${escH(rName)}</div>`,iconAnchor:[30,10]});
         routePolylines[rName].push(L.marker([parseFloat(mid.lat),parseFloat(mid.lng)],{icon:lbl,interactive:false}).addTo(map));
       }
     });
@@ -501,7 +501,7 @@ function selectRoute(rName,color){
     const btn=document.getElementById('rbtn-'+CSS.escape(rName));if(btn)btn.classList.add('active');
     const badge=document.getElementById('rbadge-'+CSS.escape(rName));if(badge){badge.className='route-badge rb-active';badge.textContent=T[lang].chosen;}
   }catch(e){}
-  document.getElementById('busesTitle').innerHTML=T[lang].busTitle+' &mdash; <span style="color:'+selectedColor+';font-weight:700">'+escH(rName)+'</span>';
+  document.getElementById('busesTitle').innerHTML=T[lang].busTitle+' &mdash; <span style="color:var(--text);font-weight:700">'+escH(rName)+'</span>';
   document.getElementById('busesCard').classList.remove('hidden');
   document.getElementById('cancelBtn').classList.add('show');
   if(userLat&&userLng) savePassengerLocation(userLat,userLng,rName);
