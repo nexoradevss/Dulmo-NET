@@ -12,133 +12,779 @@
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --primary:#1a3a7d;--primary-light:#2d5aa8;--primary-lighter:#e8eef7;
-  --green:#4caf50;--green-light:#e8f5e9;--amber:#E65100;--amber-light:#FFF3E0;
-  --red:#C62828;--red-light:#FFEBEE;--bg:#0f1219;--card:#ffffff;--border:#CFD8DC;
+  --primary:#1a3a7d;
+  --primary-light:#2d5aa8;
+  --primary-lighter:#e8eef7;
+  --green:#4caf50;--green-light:#e8f5e9;
+  --amber:#E65100;--amber-light:#FFF3E0;
+  --red:#C62828;--red-light:#FFEBEE;
+  --bg:#0f1219;--card:#ffffff;--border:#CFD8DC;
   --text:#1A2332;--muted:#607D8B;--muted-light:#99a3b0;
   --r:14px;--shadow:0 2px 14px rgba(26,58,125,.1);
-  --glass-bg:rgba(255,255,255,0.08);--glass-border:rgba(255,255,255,0.15);
+  --glass-bg:rgba(255, 255, 255, 0.08);
+  --glass-border:rgba(255, 255, 255, 0.15);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{font-family:'Cairo',sans-serif;background:linear-gradient(135deg,#0f1219 0%,#1a1f2e 50%,#0f1219 100%);background-attachment:fixed;min-height:100vh;color:var(--text);}
+body{
+  font-family:'Cairo',sans-serif;
+  background:linear-gradient(135deg, #0f1219 0%, #1a1f2e 50%, #0f1219 100%);
+  background-attachment:fixed;
+  min-height:100vh;
+  color:var(--text);
+}
 .bus-marker-icon{background:transparent!important;border:none!important;}
-.hdr{background:rgba(26,58,125,0.12);backdrop-filter:blur(10px) saturate(180%);-webkit-backdrop-filter:blur(10px) saturate(180%);border-bottom:1px solid rgba(255,255,255,0.12);padding:6px 14px;color:#fff;display:flex;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 8px 32px rgba(26,58,125,0.1);min-height:48px;}
-.hdr-logo{font-size:20px;flex-shrink:0;}
-.hdr-title{flex:1;margin-left:8px;}
-.hdr-title h1{font-size:15px;font-weight:700;margin:0;}
-.hdr-location-indicator{display:flex;align-items:center;gap:6px;font-size:12px;margin-right:auto;color:rgba(255,255,255,0.7);}
-.location-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#ccc;animation:pulse-location 2s infinite;}
-.location-dot.ok{background:#4caf50;animation:pulse-location-ok 2s infinite;}
-@keyframes pulse-location{0%,100%{opacity:0.6;transform:scale(1);}50%{opacity:1;transform:scale(1.2);}}
-@keyframes pulse-location-ok{0%,100%{opacity:0.8;transform:scale(1);}50%{opacity:1;transform:scale(1.15);}}
-@keyframes shake{0%,100%{transform:translateX(0)}15%{transform:translateX(-5px)}35%{transform:translateX(5px)}55%{transform:translateX(-4px)}75%{transform:translateX(4px)}90%{transform:translateX(-2px)}}
-.shake-anim{animation:shake 0.7s ease !important;border-color:rgba(255,100,100,0.8)!important;background:rgba(255,80,80,0.3)!important;}
-@keyframes sat-wave-pulse-1{0%,100%{opacity:0.9;stroke-dashoffset:0;}50%{opacity:0.4;stroke-dashoffset:4;}}
-@keyframes sat-wave-pulse-2{0%,100%{opacity:0.6;stroke-dashoffset:0;}50%{opacity:0.2;stroke-dashoffset:4;}}
-@keyframes sat-wave-pulse-3{0%,100%{opacity:0.4;stroke-dashoffset:0;}50%{opacity:0.1;stroke-dashoffset:4;}}
-.sat-wave{stroke-dasharray:6 2;}
-.sat-wave-1{animation:sat-wave-pulse-1 1.6s ease-in-out infinite;}
-.sat-wave-2{animation:sat-wave-pulse-2 1.6s ease-in-out infinite 0.3s;}
-.sat-wave-3{animation:sat-wave-pulse-3 1.6s ease-in-out infinite 0.6s;}
-#getLocationBtn{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;padding:0!important;margin:0;background:rgba(255,255,255,0.2)!important;border:1px solid rgba(255,255,255,0.3)!important;border-radius:7px;cursor:pointer;color:#fff;font-size:16px;transition:all 0.3s ease;flex-shrink:0;}
-#getLocationBtn:hover{background:rgba(255,255,255,0.3)!important;border-color:rgba(255,255,255,0.5)!important;}
-.location-btn{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;padding:0!important;margin:0;background:rgba(255,255,255,0.2)!important;border:1px solid rgba(255,255,255,0.3)!important;border-radius:5px;cursor:pointer;color:#fff;font-size:14px;transition:all 0.3s ease;flex-shrink:0;}
-.hdr-lang-btn{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:6px;color:#fff;cursor:pointer;padding:4px 6px;font-size:13px;font-weight:700;transition:all 0.3s ease;flex-shrink:0;display:flex;align-items:center;gap:4px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);}
-.hdr-cancel-btn{background:rgba(255,255,255,0.1);color:#fff;border:1px solid rgba(255,255,255,0.2);border-radius:6px;padding:4px 8px;font-family:'Cairo',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;display:none;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);transition:all 0.3s ease;}
+
+/* ═══ HEADER - GLASSMORPHISM ═══ */
+.hdr{
+  background:rgba(26, 58, 125, 0.12);
+  backdrop-filter:blur(10px) saturate(180%);
+  -webkit-backdrop-filter:blur(10px) saturate(180%);
+  border-bottom:1px solid rgba(255, 255, 255, 0.12);
+  padding:6px 14px;
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  box-shadow:0 8px 32px rgba(26, 58, 125, 0.1);
+  min-height:48px;
+}
+.hdr-logo{font-size:20px; flex-shrink:0;}
+.hdr-title{flex:1; margin-left:8px;}
+.hdr-title h1{font-size:15px;font-weight:700; margin:0;}
+
+.hdr-location-indicator{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-size:12px;
+  margin-right:auto;
+  color:rgba(255, 255, 255, 0.7);
+}
+.location-dot{
+  display:inline-block;
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:#ccc;
+  animation:pulse-location 2s infinite;
+}
+.location-dot.ok{
+  background:#4caf50;
+  animation:pulse-location-ok 2s infinite;
+}
+@keyframes pulse-location{
+  0%, 100%{opacity:0.6; transform:scale(1);}
+  50%{opacity:1; transform:scale(1.2);}
+}
+@keyframes pulse-location-ok{
+  0%, 100%{opacity:0.8; transform:scale(1);}
+  50%{opacity:1; transform:scale(1.15);}
+}
+@keyframes shake{
+  0%,100%{transform:translateX(0)}
+  15%{transform:translateX(-5px)}
+  35%{transform:translateX(5px)}
+  55%{transform:translateX(-4px)}
+  75%{transform:translateX(4px)}
+  90%{transform:translateX(-2px)}
+}
+.shake-anim{
+  animation:shake 0.7s ease !important;
+  border-color:rgba(255,100,100,0.8) !important;
+  background:rgba(255,80,80,0.3) !important;
+}
+
+@keyframes sat-wave-pulse-1{
+  0%,100%{opacity:0.9; stroke-dashoffset:0;}
+  50%{opacity:0.4; stroke-dashoffset:4;}
+}
+@keyframes sat-wave-pulse-2{
+  0%,100%{opacity:0.6; stroke-dashoffset:0;}
+  50%{opacity:0.2; stroke-dashoffset:4;}
+}
+@keyframes sat-wave-pulse-3{
+  0%,100%{opacity:0.4; stroke-dashoffset:0;}
+  50%{opacity:0.1; stroke-dashoffset:4;}
+}
+.sat-wave{ stroke-dasharray:6 2; }
+.sat-wave-1{ animation:sat-wave-pulse-1 1.6s ease-in-out infinite; }
+.sat-wave-2{ animation:sat-wave-pulse-2 1.6s ease-in-out infinite 0.3s; }
+.sat-wave-3{ animation:sat-wave-pulse-3 1.6s ease-in-out infinite 0.6s; }
+
+/* ── تعديل: زر الموقع مع نص ── */
+#getLocationBtn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+  height:32px;
+  padding:0 10px !important;
+  margin:0;
+  background:rgba(255, 255, 255, 0.2) !important;
+  border:1px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius:7px;
+  cursor:pointer;
+  color:#fff;
+  font-size:12px;
+  font-weight:700;
+  font-family:'Cairo',sans-serif;
+  white-space:nowrap;
+  transition:all 0.3s ease;
+  flex-shrink:0;
+}
+
+#getLocationBtn:hover{
+  background:rgba(255, 255, 255, 0.3) !important;
+  border-color:rgba(255, 255, 255, 0.5) !important;
+}
+
+/* نص داخل زر الموقع */
+.loc-btn-text{
+  font-size:11px;
+  font-weight:700;
+  color:#fff;
+  white-space:nowrap;
+  line-height:1;
+}
+
+.location-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:24px;
+  height:24px;
+  padding:0 !important;
+  margin:0;
+  background:rgba(255, 255, 255, 0.2) !important;
+  border:1px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius:5px;
+  cursor:pointer;
+  color:#fff;
+  font-size:14px;
+  transition:all 0.3s ease;
+  flex-shrink:0;
+}
+
+.location-btn:hover{
+  background:rgba(255, 255, 255, 0.3) !important;
+  border-color:rgba(255, 255, 255, 0.5) !important;
+}
+
+.hdr-lang-btn{
+  background:rgba(255, 255, 255, 0.1);
+  border:1px solid rgba(255, 255, 255, 0.2);
+  border-radius:6px;
+  color:#fff;
+  cursor:pointer;
+  padding:4px 6px;
+  font-size:13px;
+  font-weight:700;
+  transition:all 0.3s ease;
+  flex-shrink:0;
+  display:flex;
+  align-items:center;
+  gap:4px;
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+}
+.hdr-lang-btn:hover{
+  background:rgba(255, 255, 255, 0.15);
+  border-color:rgba(255, 255, 255, 0.3);
+}
+
+.hdr-cancel-btn{
+  background:rgba(255, 255, 255, 0.1);
+  color:#fff;
+  border:1px solid rgba(255, 255, 255, 0.2);
+  border-radius:6px;
+  padding:4px 8px;
+  font-family:'Cairo',sans-serif;
+  font-size:12px;
+  font-weight:700;
+  cursor:pointer;
+  white-space:nowrap;
+  flex-shrink:0;
+  display:none;
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+  transition:all 0.3s ease;
+}
+.hdr-cancel-btn:hover{
+  background:rgba(255, 255, 255, 0.15);
+  border-color:rgba(255, 255, 255, 0.3);
+}
 .hdr-cancel-btn.show{display:block}
-.wrap{max-width:520px;margin:0 auto;padding:0 10px 30px}
-.card{background:rgba(255,255,255,0.08);backdrop-filter:blur(12px) saturate(180%);-webkit-backdrop-filter:blur(12px) saturate(180%);border-radius:var(--r);padding:10px 12px;margin-bottom:8px;box-shadow:0 8px 32px rgba(26,58,125,0.1);border:1px solid rgba(255,255,255,0.15);transition:all 0.3s ease;}
-.card-title{font-size:12px;font-weight:700;color:rgba(255,255,255,0.7);letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:5px;}
-#map{height:520px;border-radius:12px;border:1.5px solid rgba(255,255,255,0.15);overflow:hidden;z-index:0;box-shadow:0 8px 32px rgba(26,58,125,0.15);display:block;}
+
+/* ═══ CARDS - GLASSMORPHISM ═══ */
+/* ── تعديل: تقليص padding الـ wrap وإزالة المساحة الفارغة ── */
+.wrap{max-width:520px;margin:0 auto;padding:0 0 30px}
+.card{
+  background:rgba(255, 255, 255, 0.08);
+  backdrop-filter:blur(12px) saturate(180%);
+  -webkit-backdrop-filter:blur(12px) saturate(180%);
+  border-radius:var(--r);
+  padding:10px 12px;
+  margin-bottom:8px;
+  box-shadow:0 8px 32px rgba(26, 58, 125, 0.1);
+  border:1px solid rgba(255, 255, 255, 0.15);
+  transition:all 0.3s ease;
+}
+.card:hover{
+  background:rgba(255, 255, 255, 0.12);
+  border-color:rgba(255, 255, 255, 0.2);
+  box-shadow:0 12px 40px rgba(26, 58, 125, 0.15);
+}
+
+.card-title{
+  font-size:12px;
+  font-weight:700;
+  color:rgba(255, 255, 255, 0.7);
+  letter-spacing:.8px;
+  text-transform:uppercase;
+  margin-bottom:6px;
+  display:flex;
+  align-items:center;
+  gap:5px;
+}
+
+/* ── تعديل: تكبير الخريطة ── */
+#map{
+  height:580px;
+  border-radius:12px;
+  border:1.5px solid rgba(255, 255, 255, 0.15);
+  overflow:hidden;
+  z-index:0;
+  box-shadow:0 8px 32px rgba(26, 58, 125, 0.15);
+  display:block;
+}
+
+/* ═══ ROUTE BUTTONS - GLASSMORPHISM ═══ */
 .routes-grid{display:flex;flex-direction:column;gap:5px}
-.route-btn{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:10px;border:1.5px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.05);cursor:pointer;transition:all 0.3s ease;width:100%;font-family:'Cairo',sans-serif;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);}
-.route-btn.active{border-color:rgba(26,58,125,0.6);background:rgba(26,58,125,0.2);box-shadow:0 0 0 3px rgba(26,58,125,0.2);}
+.route-btn{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:7px 10px;
+  border-radius:10px;
+  border:1.5px solid rgba(255, 255, 255, 0.15);
+  background:rgba(255, 255, 255, 0.05);
+  cursor:pointer;
+  transition:all 0.3s ease;
+  width:100%;
+  font-family:'Cairo',sans-serif;
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+}
+.route-btn:hover{
+  border-color:rgba(26, 58, 125, 0.4);
+  background:rgba(26, 58, 125, 0.1);
+  box-shadow:0 8px 24px rgba(26, 58, 125, 0.15);
+}
+.route-btn.active{
+  border-color:rgba(26, 58, 125, 0.6);
+  background:rgba(26, 58, 125, 0.2);
+  box-shadow:0 0 0 3px rgba(26, 58, 125, 0.2);
+}
+
 .route-dot{width:14px;height:14px;border-radius:50%;flex-shrink:0}
 .route-btn-info{flex:1;text-align:right}
-.route-btn-name{font-size:13px;font-weight:700;color:rgba(255,255,255,0.9);}
-.route-btn-meta{font-size:11px;color:rgba(255,255,255,0.6);margin-top:0;}
-.route-badge{font-size:11px;font-weight:700;padding:3px 8px;border-radius:7px;white-space:nowrap;flex-shrink:0;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,0.2);transition:all 0.3s ease;}
-.rb-active{background:rgba(76,175,80,0.3);color:#4caf50;border-color:rgba(76,175,80,0.4);}
-.rb-idle{background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.6);border-color:rgba(255,255,255,0.15);}
-.bus-row{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:11px;padding:7px 10px;margin-bottom:6px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);transition:all 0.3s ease;}
-.bus-icon{font-size:18px;flex-shrink:0}
+.route-btn-name{
+  font-size:13px;
+  font-weight:700;
+  color:rgba(255, 255, 255, 0.9);
+}
+.route-btn-meta{
+  font-size:11px;
+  color:rgba(255, 255, 255, 0.6);
+  margin-top:0;
+}
+
+.route-badge{
+  font-size:11px;
+  font-weight:700;
+  padding:3px 8px;
+  border-radius:7px;
+  white-space:nowrap;
+  flex-shrink:0;
+  backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(255, 255, 255, 0.2);
+  transition:all 0.3s ease;
+}
+.rb-active{
+  background:rgba(76, 175, 80, 0.3);
+  color:#4caf50;
+  border-color:rgba(76, 175, 80, 0.4);
+}
+.rb-idle{
+  background:rgba(255, 255, 255, 0.08);
+  color:rgba(255, 255, 255, 0.6);
+  border-color:rgba(255, 255, 255, 0.15);
+}
+
+/* ═══ BUS ROWS - تعديل: أرفع وأكثر كثافة ═══ */
+.bus-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  background:rgba(255, 255, 255, 0.07);
+  border:1px solid rgba(255, 255, 255, 0.12);
+  border-radius:9px;
+  padding:5px 8px;
+  margin-bottom:4px;
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+  transition:all 0.3s ease;
+}
+.bus-row:hover{
+  background:rgba(255, 255, 255, 0.12);
+  border-color:rgba(255, 255, 255, 0.2);
+  box-shadow:0 8px 24px rgba(30, 136, 229, 0.1);
+}
+
+.bus-icon{font-size:16px;flex-shrink:0}
 .bus-body{flex:1}
-.bus-name{font-size:14px;font-weight:700;color:rgba(255,255,255,0.9);}
-.bus-meta{font-size:12px;color:rgba(255,255,255,0.6);margin-top:2px;}
-.bus-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;}
-.bus-status{font-size:11px;font-weight:700;padding:3px 8px;border-radius:8px;white-space:nowrap;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,0.2);}
-.bs-on{background:rgba(46,125,50,0.3);color:#4caf50;border-color:rgba(46,125,50,0.4);}
-.bus-dist{font-size:12px;font-weight:700;color:#64b5f6;}
-.bus-eta{font-size:11px;color:rgba(255,255,255,0.6);}
-.empty{text-align:center;padding:22px 10px;color:rgba(255,255,255,0.6);font-size:13px;}
+.bus-name{
+  font-size:13px;
+  font-weight:700;
+  color:rgba(255, 255, 255, 0.9);
+  line-height:1.2;
+}
+.bus-meta{
+  font-size:11px;
+  color:rgba(255, 255, 255, 0.6);
+  margin-top:1px;
+  line-height:1.2;
+}
+
+.bus-right{
+  display:flex;
+  flex-direction:row;
+  align-items:center;
+  gap:6px;
+  flex-shrink:0;
+}
+
+.bus-status{
+  font-size:10px;
+  font-weight:700;
+  padding:2px 7px;
+  border-radius:6px;
+  white-space:nowrap;
+  backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(255, 255, 255, 0.2);
+}
+.bs-on{
+  background:rgba(46, 125, 50, 0.3);
+  color:#4caf50;
+  border-color:rgba(46, 125, 50, 0.4);
+}
+
+.bus-dist{
+  font-size:11px;
+  font-weight:700;
+  color:#64b5f6;
+}
+.bus-eta{
+  font-size:10px;
+  color:rgba(255, 255, 255, 0.6);
+}
+
+@keyframes spin{to{transform:rotate(360deg)}}
+.empty{
+  text-align:center;
+  padding:22px 10px;
+  color:rgba(255, 255, 255, 0.6);
+  font-size:13px;
+}
 .empty-e{font-size:28px;margin-bottom:6px}
+
 .refresh-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
-.refresh-btn{background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.15);border-radius:9px;padding:5px 11px;font-size:12px;font-family:'Cairo',sans-serif;color:rgba(255,255,255,0.7);cursor:pointer;transition:all 0.3s ease;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);}
-.update-time{font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:8px;}
+.refresh-btn{
+  background:rgba(255, 255, 255, 0.08);
+  border:1.5px solid rgba(255, 255, 255, 0.15);
+  border-radius:9px;
+  padding:5px 11px;
+  font-size:12px;
+  font-family:'Cairo',sans-serif;
+  color:rgba(255, 255, 255, 0.7);
+  cursor:pointer;
+  transition:all 0.3s ease;
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+}
+.refresh-btn:hover{
+  border-color:rgba(26, 58, 125, 0.4);
+  color:#fff;
+  background:rgba(26, 58, 125, 0.1);
+  box-shadow:0 8px 24px rgba(26, 58, 125, 0.15);
+}
+
+.update-time{
+  font-size:11px;
+  color:rgba(255, 255, 255, 0.5);
+  margin-bottom:8px;
+}
+
 .hidden{display:none!important}
-.direction-tab{display:inline-block;font-size:11px;padding:2px 8px;border-radius:6px;font-weight:700;margin-right:4px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,0.15);}
-.dir-go{background:rgba(26,58,125,0.2);color:#64b5f6;border-color:rgba(26,58,125,0.3);}
-.dir-back{background:rgba(106,27,154,0.2);color:#ce93d8;border-color:rgba(106,27,154,0.3);}
-.app-bar{background:#ffffff;border-radius:var(--r);padding:10px 12px;display:flex;align-items:center;gap:12px;margin-bottom:8px;box-shadow:0 8px 32px rgba(0,0,0,0.15);border:1px solid rgba(0,0,0,0.08);transition:all 0.3s ease;}
-.app-bar-qr{flex-shrink:0;background:rgba(26,58,125,0.05);border-radius:8px;padding:6px;width:50px;height:50px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(26,58,125,0.15);}
+.direction-tab{
+  display:inline-block;
+  font-size:11px;
+  padding:2px 8px;
+  border-radius:6px;
+  font-weight:700;
+  margin-right:4px;
+  backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(255, 255, 255, 0.15);
+}
+.dir-go{
+  background:rgba(26, 58, 125, 0.2);
+  color:#64b5f6;
+  border-color:rgba(26, 58, 125, 0.3);
+}
+.dir-back{
+  background:rgba(106, 27, 154, 0.2);
+  color:#ce93d8;
+  border-color:rgba(106, 27, 154, 0.3);
+}
+
+/* ═══ APP BAR - GLASSMORPHISM ═══ */
+.app-bar{
+  background:#ffffff;
+  border-radius:var(--r);
+  padding:8px 12px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-bottom:6px;
+  box-shadow:0 8px 32px rgba(0, 0, 0, 0.15);
+  border:1px solid rgba(0, 0, 0, 0.08);
+  transition:all 0.3s ease;
+}
+.app-bar:hover{
+  box-shadow:0 12px 40px rgba(0, 0, 0, 0.2);
+}
+
+.app-bar-qr{
+  flex-shrink:0;
+  background:rgba(26, 58, 125, 0.05);
+  border-radius:8px;
+  padding:6px;
+  width:50px;
+  height:50px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border:1px solid rgba(26, 58, 125, 0.15);
+}
 .app-bar-qr canvas,.app-bar-qr img{border-radius:4px;display:block}
-.app-bar-content{flex:1;}
-.app-bar-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px;}
-.app-bar-status{font-size:11px;color:var(--muted-light);}
-.install-btn{display:inline-flex;align-items:center;gap:6px;background:rgba(26,58,125,0.1);color:var(--primary);border:1.5px solid var(--primary);border-radius:8px;padding:6px 12px;font-family:'Cairo',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all 0.3s ease;box-shadow:0 4px 12px rgba(0,0,0,0.08);white-space:nowrap;flex-shrink:0;}
-.install-btn.installed{background:rgba(76,175,80,0.15);color:#4caf50;border-color:#4caf50;cursor:default;}
-.ios-hint{display:none;background:rgba(26,58,125,0.08);border:1px solid rgba(26,58,125,0.2);border-radius:8px;padding:6px 10px;font-size:11px;color:var(--text);line-height:1.5;flex:1;}
+
+.app-bar-content{
+  flex:1;
+}
+
+.app-bar-title{
+  font-size:13px;
+  font-weight:700;
+  color:var(--text);
+  margin-bottom:2px;
+}
+
+.app-bar-status{
+  font-size:11px;
+  color:var(--muted-light);
+}
+
+.install-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  background:rgba(26, 58, 125, 0.1);
+  color:var(--primary);
+  border:1.5px solid var(--primary);
+  border-radius:8px;
+  padding:6px 12px;
+  font-family:'Cairo',sans-serif;
+  font-size:12px;
+  font-weight:700;
+  cursor:pointer;
+  transition:all 0.3s ease;
+  box-shadow:0 4px 12px rgba(0, 0, 0, 0.08);
+  white-space:nowrap;
+  flex-shrink:0;
+}
+.install-btn:hover{
+  background:rgba(26, 58, 125, 0.15);
+  box-shadow:0 6px 16px rgba(26, 58, 125, 0.15);
+}
+.install-btn.installed{
+  background:rgba(76, 175, 80, 0.15);
+  color:#4caf50;
+  border-color:#4caf50;
+  cursor:default;
+}
+
+.ios-hint{
+  display:none;
+  background:rgba(26, 58, 125, 0.08);
+  border:1px solid rgba(26, 58, 125, 0.2);
+  border-radius:8px;
+  padding:6px 10px;
+  font-size:11px;
+  color:var(--text);
+  line-height:1.5;
+  flex:1;
+}
 .ios-hint.show{display:block}
-.qr-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);display:none;align-items:center;justify-content:center;z-index:2000;padding:20px;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);}
+
+/* ═══ QR MODAL - GLASSMORPHISM ═══ */
+.qr-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0, 0, 0, 0.7);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:2000;
+  padding:20px;
+  backdrop-filter:blur(4px);
+  -webkit-backdrop-filter:blur(4px);
+}
 .qr-overlay.show{display:flex;}
-.qr-modal{background:#ffffff;border-radius:18px;padding:20px;max-width:520px;width:100%;box-shadow:0 22px 60px rgba(0,0,0,0.3);display:flex;flex-direction:column;align-items:center;gap:14px;border:1px solid rgba(0,0,0,0.08);}
-.qr-modal-box{padding:12px;border-radius:16px;border:1.5px solid rgba(26,58,125,0.15);background:#fafbfc;}
-.qr-modal-close{background:var(--primary);color:#fff;border:none;border-radius:8px;padding:8px 14px;font-family:'Cairo',sans-serif;font-size:13px;font-weight:700;cursor:pointer;}
-.countdown-bar{display:none;background:rgba(10,18,40,0.7)!important;backdrop-filter:blur(14px)!important;-webkit-backdrop-filter:blur(14px)!important;border:1px solid rgba(255,255,255,0.12)!important;box-shadow:0 4px 20px rgba(0,0,0,0.3)!important;border-radius:12px;padding:10px 14px;margin-bottom:8px;z-index:100;}
+
+.qr-modal{
+  background:#ffffff;
+  border-radius:18px;
+  padding:20px;
+  max-width:520px;
+  width:100%;
+  box-shadow:0 22px 60px rgba(0, 0, 0, 0.3);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:14px;
+  border:1px solid rgba(0, 0, 0, 0.08);
+}
+
+.qr-modal-box{
+  padding:12px;
+  border-radius:16px;
+  border:1.5px solid rgba(26, 58, 125, 0.15);
+  background:#fafbfc;
+  box-shadow:0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.qr-modal-close{
+  background:var(--primary);
+  color:#fff;
+  border:none;
+  border-radius:8px;
+  padding:8px 14px;
+  font-family:'Cairo',sans-serif;
+  font-size:13px;
+  font-weight:700;
+  cursor:pointer;
+  transition:all 0.3s ease;
+}
+.qr-modal-close:hover{
+  background:var(--primary-light);
+  box-shadow:0 4px 12px rgba(26, 58, 125, 0.2);
+}
+
+/* ═══ COUNTDOWN - GLASSMORPHISM FLOATING CARD ═══ */
+.countdown-bar{
+  display:none;
+  background:#ffffff;
+  border-radius:12px;
+  padding:8px 12px;
+  margin-bottom:8px;
+  border:1px solid rgba(0, 0, 0, 0.08);
+  box-shadow:0 8px 32px rgba(0, 0, 0, 0.15);
+  z-index:100;
+}
 .countdown-bar.show{display:block}
-.countdown-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
-.countdown-label{font-size:12px;font-weight:700;color:rgba(255,255,255,0.75)!important;}
-.countdown-time{font-size:14px;font-weight:700;color:#7eb3ff!important;font-variant-numeric:tabular-nums;letter-spacing:.5px;}
-.countdown-track{background:rgba(255,255,255,0.1)!important;border-radius:6px;height:6px;overflow:hidden;}
-.countdown-fill{height:100%;width:100%;background:linear-gradient(90deg,#1a3a7d,#2d5aa8);border-radius:6px;transition:width 1s linear,background 0.5s;}
-.expire-toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#ffffff;color:var(--text);padding:10px 16px;border-radius:10px;border:1px solid rgba(0,0,0,0.08);font-family:'Cairo',sans-serif;font-size:12px;font-weight:700;box-shadow:0 8px 32px rgba(0,0,0,0.15);z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;}
+
+.countdown-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:6px;
+}
+.countdown-label{
+  font-size:12px;
+  font-weight:700;
+  color:var(--text);
+}
+.countdown-time{
+  font-size:14px;
+  font-weight:700;
+  color:var(--primary);
+  font-variant-numeric:tabular-nums;
+  letter-spacing:.5px;
+}
+.countdown-track{
+  background:rgba(26, 58, 125, 0.1);
+  border-radius:6px;
+  height:6px;
+  overflow:hidden;
+  box-shadow:inset 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+.countdown-fill{
+  height:100%;
+  width:100%;
+  background:linear-gradient(90deg, #1a3a7d, #2d5aa8);
+  border-radius:6px;
+  transition:width 1s linear, background 0.5s;
+}
+
+/* ═══ TOAST - GLASSMORPHISM ═══ */
+.expire-toast{
+  position:fixed;
+  bottom:20px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#ffffff;
+  color:var(--text);
+  padding:10px 16px;
+  border-radius:10px;
+  border:1px solid rgba(0, 0, 0, 0.08);
+  font-family:'Cairo',sans-serif;
+  font-size:12px;
+  font-weight:700;
+  box-shadow:0 8px 32px rgba(0, 0, 0, 0.15);
+  z-index:9999;
+  opacity:0;
+  transition:opacity .3s;
+  pointer-events:none;
+  white-space:nowrap;
+}
 .expire-toast.show{opacity:1}
-.routes-float{position:absolute;bottom:12px;left:10px;z-index:400;width:32%;min-width:115px;max-width:180px;background:rgba(10,18,40,0.68);backdrop-filter:blur(20px) saturate(200%);-webkit-backdrop-filter:blur(20px) saturate(200%);border:1px solid rgba(255,255,255,0.15);border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.08);display:flex;flex-direction:column;overflow:hidden;}
-.routes-float-header{display:flex;align-items:center;justify-content:space-between;padding:7px 8px;cursor:pointer;flex-shrink:0;user-select:none;gap:4px;}
-.routes-float-header:hover{background:rgba(255,255,255,0.05);}
-.routes-float-title{font-size:10px;font-weight:700;color:rgba(255,255,255,0.7);letter-spacing:.6px;text-transform:uppercase;flex:1;}
-.routes-float-chevron{font-size:10px;color:rgba(255,255,255,0.5);transition:transform 0.3s ease;flex-shrink:0;line-height:1;}
-.routes-float.open .routes-float-chevron{transform:rotate(180deg);}
-.routes-float-body{max-height:0;overflow:hidden;transition:max-height 0.35s cubic-bezier(0.4,0,0.2,1);border-top:0px solid rgba(255,255,255,0.08);}
-.routes-float.open .routes-float-body{max-height:220px;border-top-width:1px;}
-.routes-float .routes-grid{overflow-y:auto;display:flex;flex-direction:column;gap:3px;padding:6px;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.15) transparent;}
+
+/* ═══ ROUTES FLOATING GLASS PANEL — COLLAPSIBLE ═══ */
+.routes-float{
+  position:absolute;
+  bottom:12px;
+  left:10px;
+  z-index:400;
+  width:32%;
+  min-width:115px;
+  max-width:180px;
+  background:rgba(10,18,40,0.68);
+  backdrop-filter:blur(20px) saturate(200%);
+  -webkit-backdrop-filter:blur(20px) saturate(200%);
+  border:1px solid rgba(255,255,255,0.15);
+  border-radius:14px;
+  box-shadow:0 8px 32px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08);
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+.routes-float-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:7px 8px;
+  cursor:pointer;
+  flex-shrink:0;
+  user-select:none;
+  gap:4px;
+}
+.routes-float-header:hover{
+  background:rgba(255,255,255,0.05);
+}
+.routes-float-title{
+  font-size:10px;
+  font-weight:700;
+  color:rgba(255,255,255,0.7);
+  letter-spacing:.6px;
+  text-transform:uppercase;
+  flex:1;
+}
+.routes-float-chevron{
+  font-size:10px;
+  color:rgba(255,255,255,0.5);
+  transition:transform 0.3s ease;
+  flex-shrink:0;
+  line-height:1;
+}
+.routes-float.open .routes-float-chevron{
+  transform:rotate(180deg);
+}
+.routes-float-body{
+  max-height:0;
+  overflow:hidden;
+  transition:max-height 0.35s cubic-bezier(0.4,0,0.2,1);
+  border-top:0px solid rgba(255,255,255,0.08);
+}
+.routes-float.open .routes-float-body{
+  max-height:220px;
+  border-top-width:1px;
+}
+.routes-float .routes-grid{
+  overflow-y:auto;
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+  padding:6px 6px 6px;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(255,255,255,0.15) transparent;
+}
 .routes-float .routes-grid::-webkit-scrollbar{width:3px;}
 .routes-float .routes-grid::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.18);border-radius:3px;}
-.routes-float .route-btn{padding:4px 6px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);gap:5px;}
-.routes-float .route-btn.active{background:rgba(26,58,125,0.4);border-color:rgba(100,150,255,0.45);box-shadow:0 0 0 2px rgba(26,58,125,0.25);}
+.routes-float .route-btn{
+  padding:4px 6px;
+  border-radius:8px;
+  border:1px solid rgba(255,255,255,0.1);
+  background:rgba(255,255,255,0.05);
+  gap:5px;
+}
+.routes-float .route-btn:hover{
+  background:rgba(255,255,255,0.1);
+  border-color:rgba(255,255,255,0.2);
+}
+.routes-float .route-btn.active{
+  background:rgba(26,58,125,0.4);
+  border-color:rgba(100,150,255,0.45);
+  box-shadow:0 0 0 2px rgba(26,58,125,0.25);
+}
 .routes-float .route-btn-name{font-size:10px;}
 .routes-float .route-btn-meta{display:none;}
 .routes-float .route-badge{font-size:9px;padding:1px 5px;}
 .routes-float .route-dot{width:8px;height:8px;flex-shrink:0;}
 .routes-float .direction-tab{display:none;}
+.countdown-bar{
+  background:rgba(10,18,40,0.7) !important;
+  backdrop-filter:blur(14px) !important;
+  -webkit-backdrop-filter:blur(14px) !important;
+  border:1px solid rgba(255,255,255,0.12) !important;
+  box-shadow:0 4px 20px rgba(0,0,0,0.3) !important;
+}
+.countdown-label{color:rgba(255,255,255,0.75) !important;}
+.countdown-time{color:#7eb3ff !important;}
+.countdown-track{background:rgba(255,255,255,0.1) !important;}
 </style>
 </head>
 <body>
 
-<div style="background:rgba(26,58,125,0.12);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);position:sticky;top:0;z-index:1000;border-bottom:1px solid rgba(255,255,255,0.12);">
+<div style="background:rgba(26, 58, 125, 0.12); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); position:sticky;top:0;z-index:1000; border-bottom:1px solid rgba(255, 255, 255, 0.12);">
   <div class="hdr">
-    <div style="display:flex;align-items:center;gap:6px;">
+    <div style="display:flex; align-items:center; gap:6px;">
       <div class="hdr-logo">🚌</div>
       <div class="hdr-title"><h1>Dolmuş NET</h1></div>
     </div>
+    
     <div class="hdr-location-indicator" id="locationIndicator">
-      <button id="getLocationBtn" onclick="getLocation()" class="location-btn" title="تحديد موقعي" style="width:32px;height:32px;font-size:16px;">
-        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 100 100" fill="none">
+      <!-- ── تعديل: زر الموقع مع نص واضح ── -->
+      <button id="getLocationBtn" onclick="getLocation()" title="تحديد موقعي">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 100 100" fill="none" style="flex-shrink:0;">
           <g transform="rotate(-45 50 50)">
             <rect x="2" y="28" width="30" height="18" rx="2" stroke="white" stroke-width="3.5" fill="none"/>
             <line x1="12" y1="28" x2="12" y2="46" stroke="white" stroke-width="1.8"/>
             <line x1="22" y1="28" x2="22" y2="46" stroke="white" stroke-width="1.8"/>
-            <line x1="2" y1="37" x2="32" y2="37" stroke="white" stroke-width="1.8"/>
+            <line x1="2"  y1="37" x2="32" y2="37" stroke="white" stroke-width="1.8"/>
             <rect x="32" y="34" width="10" height="5" rx="1" stroke="white" stroke-width="2.5" fill="none"/>
             <rect x="42" y="30" width="16" height="13" rx="3" stroke="white" stroke-width="3.5" fill="none"/>
             <line x1="48" y1="30" x2="48" y2="43" stroke="white" stroke-width="1.5"/>
@@ -158,12 +804,14 @@ body{font-family:'Cairo',sans-serif;background:linear-gradient(135deg,#0f1219 0%
           <path class="sat-wave sat-wave-2" d="M 17 68 Q 11 76, 17 88" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/>
           <path class="sat-wave sat-wave-3" d="M 12 64 Q 4 74, 12 92" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/>
         </svg>
+        <span class="loc-btn-text" id="locBtnLabel">حدد موقعي</span>
       </button>
       <span class="location-dot" id="locationDot"></span>
-      <span id="cityName">Şehir</span>
+      <span id="cityName" style="display:none"></span>
     </div>
+    
     <button class="hdr-lang-btn" id="langBtn" onclick="toggleLangMenu()">🌐</button>
-    <select class="hdr-lang-btn" id="langSelect" onchange="setLang(this.value)" style="display:none;position:absolute;right:10px;top:6px;z-index:2000;">
+    <select class="hdr-lang-btn" id="langSelect" onchange="setLang(this.value)" style="display:none; position:absolute; right:10px; top:6px; z-index:2000;">
       <option value="tr" selected>🇹🇷 TR</option>
       <option value="en">🇬🇧 EN</option>
       <option value="ar">🇸🇦 AR</option>
@@ -231,23 +879,22 @@ body{font-family:'Cairo',sans-serif;background:linear-gradient(135deg,#0f1219 0%
   </div>
 </div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
 <script>
-const SB_URL='https://ezmvwhpmvuokrrvsohuv.supabase.co';
-const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV6bXZ3aHBtdnVva3JydnNvaHV2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTcxNDQsImV4cCI6MjA5NDI3MzE0NH0.je77PXmfbjR9H7TWzVhpQ4Kt6mTRiI0UfS9pHQzpHhU';
-if('serviceWorker' in navigator){navigator.serviceWorker.register('/Dulmo-NET/sw.js');}
+const SB_URL = 'https://ezmvwhpmvuokrrvsohuv.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV6bXZ3aHBtdnVva3JydnNvaHV2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTcxNDQsImV4cCI6MjA5NDI3MzE0NH0.je77PXmfbjR9H7TWzVhpQ4Kt6mTRiI0UfS9pHQzpHhU';
+if('serviceWorker' in navigator){ navigator.serviceWorker.register('/Dulmo-NET/sw.js'); }
+const COLORS = ['#1E88E5','#E53935','#43A047','#FB8C00','#8E24AA','#00ACC1','#F4511E','#3949AB','#00897B','#D81B60'];
+const PASSENGER_TTL_MS = 15 * 60 * 1000;
+const ARRIVAL_RADIUS_M = 100;
+const ARRIVAL_COUNTDOWN_S = 100;
+const PING_INTERVAL_MS = 30000;
 
-const COLORS=['#1E88E5','#E53935','#43A047','#FB8C00','#8E24AA','#00ACC1','#F4511E','#3949AB','#00897B','#D81B60'];
-const PASSENGER_TTL_MS=15*60*1000;
-const ARRIVAL_RADIUS_M=100;
-const ARRIVAL_COUNTDOWN_S=100;
-const PING_INTERVAL_MS=30000;
-
-const T={
-  tr:{locBtn:'Konumumu Bul',locating:'⏳ Belirleniyor...',locOk:'✅ Konum Alındı',locErr:'↩ Konum Alınamadı',locNo:'❌ GPS Desteklenmiyor',mapTitle:'🗺️ Hat Haritası',routeTitle:'🚌 Hat Seç',busTitle:'🚌 Aktif Otobüsler',loading:'Yükleniyor...',noRoutes:'Kayıtlı hat yok',noRouteErr:'Hat yükleme hatası',noBuses:'Bu hatta aktif otobüs yok',refresh:'🔄 Yenile',autoRefresh:"🔄 10 sn'de bir yenileniyor",lastUpdate:'Son güncelleme: ',going:'Gidiş',returning:'Dönüş',choose:'Seç',chosen:'✅ Seçildi',lineLabel:'Hat:',goStart:'Gidiş Başlangıç',goEnd:'Gidiş Sonu',retStart:'Dönüş Başlangıç',retEnd:'Dönüş Sonu',myLoc:'📍 Konumunuz',cancel:'✖ İptal',moving:'🟢 Aktif',connErr:'Bağlantı hatası',installBtn:'Kur',installedBtn:'✅ Kurulu',iosHint:'<b>Safari:</b> Paylaş 🔗 → <b>Ana Ekrana Ekle</b>',toastArrived:'🚌 Otobüs yaklaştı — talep iptal edildi',toastExpired:'⏱️ 15 dk geçti — talep iptal edildi',countdownLabel:'⏱️ Talebiniz sona eriyor:',appBarTitle:'Taşınabilir Uygulama',appBarStatus:'Telefonunuza kurun',qrClose:'Kapat',noLocation:'📍 Lütfen önce konumunuzu belirleyin'},
-  en:{locBtn:'Find My Location',locating:'⏳ Locating...',locOk:'✅ Location Found',locErr:'↩ Location Failed',locNo:'❌ GPS Not Supported',mapTitle:'🗺️ Route Map',routeTitle:'🚌 Select Route',busTitle:'🚌 Active Buses',loading:'Loading...',noRoutes:'No routes found',noRouteErr:'Route load error',noBuses:'No active buses on this route',refresh:'🔄 Refresh',autoRefresh:'🔄 Auto-refresh every 10s',lastUpdate:'Last update: ',going:'Going',returning:'Return',choose:'Select',chosen:'✅ Selected',lineLabel:'Route:',goStart:'Going Start',goEnd:'Going End',retStart:'Return Start',retEnd:'Return End',myLoc:'📍 Your Location',cancel:'✖ Cancel',moving:'🟢 Active',connErr:'Connection error',installBtn:'Install',installedBtn:'✅ Installed',iosHint:'<b>Safari:</b> Share 🔗 → <b>Add to Home Screen</b>',toastArrived:'🚌 Bus arrived — request cancelled',toastExpired:'⏱️ 15 min passed — request cancelled',countdownLabel:'⏱️ Request expires in:',appBarTitle:'Mobile App',appBarStatus:'Install on your phone',qrClose:'Close',noLocation:'📍 Please enable your location first'},
-  ar:{locBtn:'تحديد موقعي',locating:'⏳ جاري التحديد...',locOk:'✅ تم تحديد موقعك',locErr:'↩ تعذّر التحديد',locNo:'❌ GPS غير مدعوم',mapTitle:'🗺️ خريطة المسارات',routeTitle:'🚌 اختر الخط',busTitle:'🚌 الحافلات الفعالة',loading:'جاري التحميل...',noRoutes:'لا توجد خطوط محفوظة',noRouteErr:'خطأ في تحميل الخطوط',noBuses:'لا توجد حافلات فعالة على هذا الخط الآن',refresh:'🔄 تحديث',autoRefresh:'🔄 تحديث تلقائي كل 10 ثوانٍ',lastUpdate:'آخر تحديث: ',going:'ذهاب',returning:'عودة',choose:'اختر',chosen:'✅ محدد',lineLabel:'الخط:',goStart:'بداية الذهاب',goEnd:'نهاية الذهاب',retStart:'بداية العودة',retEnd:'نهاية العودة',myLoc:'📍 موقعك الحالي',cancel:'✖ إلغاء',moving:'🟢 متحرك',connErr:'خطأ في الاتصال',installBtn:'تثبيت',installedBtn:'✅ تم التثبيت',iosHint:'<b>Safari:</b> زر المشاركة 🔗 ← <b>إضافة إلى الشاشة الرئيسية</b>',toastArrived:'🚌 اقتربت الحافلة — سيُلغى الطلب خلال 3 دقائق',toastExpired:'⏱️ انتهت 15 دقيقة — تم إلغاء الطلب',countdownLabel:'⏱️ طلبك ينتهي بعد:',appBarTitle:'التطبيق المحمول',appBarStatus:'ثبّته على هاتفك',qrClose:'إغلاق',noLocation:'📍 يرجى تحديد موقعك أولاً'}
+const T = {
+  tr:{locBtn:'Konum Bul',locating:'⏳ Belirleniyor...',locOk:'✅ Konum Alındı',locErr:'↩ Konum Alınamadı',locNo:'❌ GPS Desteklenmiyor',mapTitle:'🗺️ Hat Haritası',routeTitle:'🚌 Hat Seç',busTitle:'🚌 Aktif Otobüsler',loading:'Yükleniyor...',noRoutes:'Kayıtlı hat yok',noRouteErr:'Hat yükleme hatası',noBuses:'Bu hatta aktif otobüs yok',refresh:'🔄 Yenile',autoRefresh:"🔄 10 sn'de bir yenileniyor",lastUpdate:'Son güncelleme: ',going:'Gidiş',returning:'Dönüş',choose:'Seç',chosen:'✅ Seçildi',lineLabel:'Hat:',goStart:'Gidiş Başlangıç',goEnd:'Gidiş Sonu',retStart:'Dönüş Başlangıç',retEnd:'Dönüş Sonu',myLoc:'📍 Konumunuz',cancel:'✖ İptal',moving:'🟢 Aktif',connErr:'Bağlantı hatası',installBtn:'Kur',installedBtn:'✅ Kurulu',iosHint:'<b>Safari:</b> Paylaş 🔗 → <b>Ana Ekrana Ekle</b>',toastArrived:'🚌 Otobüs yaklaştı — talep iptal edildi',toastExpired:'⏱️ 15 dk geçti — talep iptal edildi',countdownLabel:'⏱️ Talebiniz sona eriyor:',appBarTitle:'Taşınabilir Uygulama',appBarStatus:'Telefonunuza kurun',qrClose:'Kapat',noLocation:'📍 Lütfen önce konumunuzu belirleyin'},
+  en:{locBtn:'Find Location',locating:'⏳ Locating...',locOk:'✅ Location Found',locErr:'↩ Location Failed',locNo:'❌ GPS Not Supported',mapTitle:'🗺️ Route Map',routeTitle:'🚌 Select Route',busTitle:'🚌 Active Buses',loading:'Loading...',noRoutes:'No routes found',noRouteErr:'Route load error',noBuses:'No active buses on this route',refresh:'🔄 Refresh',autoRefresh:'🔄 Auto-refresh every 10s',lastUpdate:'Last update: ',going:'Going',returning:'Return',choose:'Select',chosen:'✅ Selected',lineLabel:'Route:',goStart:'Going Start',goEnd:'Going End',retStart:'Return Start',retEnd:'Return End',myLoc:'📍 Your Location',cancel:'✖ Cancel',moving:'🟢 Active',connErr:'Connection error',installBtn:'Install',installedBtn:'✅ Installed',iosHint:'<b>Safari:</b> Share 🔗 → <b>Add to Home Screen</b>',toastArrived:'🚌 Bus arrived — request cancelled',toastExpired:'⏱️ 15 min passed — request cancelled',countdownLabel:'⏱️ Request expires in:',appBarTitle:'Mobile App',appBarStatus:'Install on your phone',qrClose:'Close',noLocation:'📍 Please enable your location first'},
+  ar:{locBtn:'حدد موقعي',locating:'⏳ جاري التحديد...',locOk:'✅ تم تحديد موقعك',locErr:'↩ تعذّر التحديد',locNo:'❌ GPS غير مدعوم',mapTitle:'🗺️ خريطة المسارات',routeTitle:'🚌 اختر الخط',busTitle:'🚌 الحافلات الفعالة',loading:'جاري التحميل...',noRoutes:'لا توجد خطوط محفوظة',noRouteErr:'خطأ في تحميل الخطوط',noBuses:'لا توجد حافلات فعالة على هذا الخط الآن',refresh:'🔄 تحديث',autoRefresh:'🔄 تحديث تلقائي كل 10 ثوانٍ',lastUpdate:'آخر تحديث: ',going:'ذهاب',returning:'عودة',choose:'اختر',chosen:'✅ محدد',lineLabel:'الخط:',goStart:'بداية الذهاب',goEnd:'نهاية الذهاب',retStart:'بداية العودة',retEnd:'نهاية العودة',myLoc:'📍 موقعك الحالي',cancel:'✖ إلغاء',moving:'🟢 متحرك',connErr:'خطأ في الاتصال',installBtn:'تثبيت',installedBtn:'✅ تم التثبيت',iosHint:'<b>Safari:</b> زر المشاركة 🔗 ← <b>إضافة إلى الشاشة الرئيسية</b>',toastArrived:'🚌 اقتربت الحافلة — سيُلغى الطلب خلال 3 دقائق',toastExpired:'⏱️ انتهت 15 دقيقة — تم إلغاء الطلب',countdownLabel:'⏱️ طلبك ينتهي بعد:',appBarTitle:'التطبيق المحمول',appBarStatus:'ثبّته على هاتفك',qrClose:'إغلاق',noLocation:'📍 يرجى تحديد موقعك أولاً'}
 };
 
 let lang='tr';
@@ -255,26 +902,76 @@ let deferredPrompt=null;
 const isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent)&&!window.MSStream;
 const isStandalone=window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;
 
-/* ✅ FIX: تعريف المتغيرات الأساسية التي كانت مفقودة */
-let map=null;
-let userLat=null;
-let userLng=null;
-let userMarker=null;
-
-let busMarkers=[],routePolylines={},selectedRouteName=null,selectedColor='#1E88E5';
-let busInterval=null,routeColorMap={};
-let passengerId='p_'+Math.random().toString(36).substr(2,9);
-let autoExpireTimeout=null;
-let countdownInterval=null;
-let countdownRemaining=0;
-let arrivalCountdownTimeout=null;
-let arrivalWarningShown=false;
-let pingInterval=null;
+let userLat=null,userLng=null,map=null,userMarker=null;
 
 function toggleLangMenu(){
-  const s=document.getElementById('langSelect');
-  s.style.display=(s.style.display==='none'?'block':'none');
-  if(s.style.display==='block')s.focus();
+  const select=document.getElementById('langSelect');
+  if(select.style.display==='none'){select.style.display='block';select.focus();}
+  else{select.style.display='none';}
+}
+
+function updateLocationIndicator(lat,lng){
+  const dot=document.getElementById('locationDot');
+  const lbl=document.getElementById('locBtnLabel');
+  if(lat!==null&&lng!==null){
+    dot.classList.add('ok');
+    lbl.textContent=T[lang].locOk;
+  }else{
+    dot.classList.remove('ok');
+    lbl.textContent=T[lang].locBtn;
+  }
+}
+
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;});
+window.addEventListener('appinstalled',()=>{deferredPrompt=null;markInstalled();});
+
+function markInstalled(){
+  const btn=document.getElementById('installBtn');
+  document.getElementById('installBtnIcon').textContent='✅';
+  document.getElementById('installBtnTxt').textContent=T[lang].installedBtn;
+  btn.classList.add('installed');btn.disabled=true;
+  document.getElementById('iosHint').classList.remove('show');
+}
+
+async function triggerInstall(){
+  if(isStandalone){markInstalled();return;}
+  if(deferredPrompt){
+    deferredPrompt.prompt();
+    const choice=await deferredPrompt.userChoice;
+    deferredPrompt=null;
+    if(choice.outcome==='accepted')markInstalled();
+  }else if(isIOS){
+    document.getElementById('iosHint').classList.toggle('show');
+  }
+}
+
+function generateQR(){
+  const box=document.getElementById('qrBox');
+  box.innerHTML='';box.style.cursor='pointer';box.onclick=showQrOverlay;
+  const url=window.location.href.split('?')[0];
+  try{new QRCode(box,{text:url,width:48,height:48,colorDark:'#1565C0',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});}
+  catch(e){box.innerHTML='<div style="font-size:30px;line-height:48px;text-align:center">📱</div>';}
+  generateQRModal();
+}
+
+function generateQRModal(){
+  const box=document.getElementById('qrModalBox');box.innerHTML='';
+  const url=window.location.href.split('?')[0];
+  try{new QRCode(box,{text:url,width:260,height:260,colorDark:'#1565C0',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});}
+  catch(e){box.innerHTML='<div style="font-size:48px;line-height:260px;text-align:center">📱</div>';}
+}
+
+function showQrOverlay(){document.getElementById('qrOverlay').classList.add('show');}
+function closeQrOverlay(){document.getElementById('qrOverlay').classList.remove('show');}
+
+function initAppCard(){
+  generateQR();
+  document.getElementById('iosHint').innerHTML=T[lang].iosHint;
+  const ibt=document.getElementById('installBtnTxt');
+  if(ibt)ibt.textContent=T[lang].installBtn;
+  if(isStandalone){markInstalled();return;}
+  if(isIOS){document.getElementById('installBtn').style.display='inline-flex';}
+  getLocation();
 }
 
 function setLang(l){
@@ -291,6 +988,7 @@ function setLang(l){
   document.getElementById('appBarTitle').textContent=T[l].appBarTitle;
   document.getElementById('appBarStatus').textContent=T[l].appBarStatus;
   document.querySelector('.qr-modal-close').textContent=T[l].qrClose;
+  document.getElementById('locBtnLabel').textContent=userLat?T[l].locOk:T[l].locBtn;
   const ibt=document.getElementById('installBtnTxt');
   if(ibt&&!document.getElementById('installBtn').disabled)ibt.textContent=T[l].installBtn;
   if(selectedRouteName){document.getElementById('busesTitle').innerHTML=T[l].busTitle+' &mdash; <span style="color:rgba(255,255,255,0.9);font-weight:700">'+escH(selectedRouteName)+'</span>';}
@@ -299,63 +997,158 @@ function setLang(l){
   document.getElementById('langSelect').style.display='none';
 }
 
-function updateLocationIndicator(lat,lng){
-  const dot=document.getElementById('locationDot');
-  if(lat!==null&&lng!==null){dot.classList.add('ok');document.getElementById('cityName').textContent='📍 Konumuyla';}
-  else{dot.classList.remove('ok');document.getElementById('cityName').textContent='Şehir';}
+function toggleRoutesPanel(){
+  document.getElementById('routesCard').classList.toggle('open');
+}
+function openRoutesPanel(){
+  document.getElementById('routesCard').classList.add('open');
+}
+
+let busMarkers=[],routePolylines={},selectedRouteName=null,selectedColor='#1E88E5';
+let busInterval=null,routeColorMap={};
+let passengerId='p_'+Math.random().toString(36).substr(2,9);
+let autoExpireTimeout=null,countdownInterval=null,countdownRemaining=0;
+let arrivalCountdownTimeout=null,arrivalWarningShown=false,pingInterval=null;
+
+function startPing(){
+  clearInterval(pingInterval);
+  pingInterval=setInterval(async()=>{
+    if(selectedRouteName&&userLat!=null&&userLng!=null){
+      await savePassengerLocation(userLat,userLng,selectedRouteName);
+    }
+  },PING_INTERVAL_MS);
+}
+function stopPing(){clearInterval(pingInterval);pingInterval=null;}
+
+function sendBeaconDelete(){
+  if(!selectedRouteName)return;
+  try{fetch(`${SB_URL}/rest/v1/passenger_locations?id=eq.${passengerId}`,{method:'DELETE',headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY},keepalive:true});}catch(e){}
+}
+
+function showToast(msg){
+  const t=document.getElementById('expireToast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),4000);
+}
+
+function startCountdown(totalSeconds){
+  countdownRemaining=totalSeconds;
+  document.getElementById('countdownBar').classList.add('show');
+  updateCountdownUI();
+  clearInterval(countdownInterval);
+  countdownInterval=setInterval(()=>{
+    countdownRemaining--;
+    if(countdownRemaining<=0){clearInterval(countdownInterval);countdownInterval=null;countdownRemaining=0;}
+    updateCountdownUI();
+  },1000);
+}
+
+function updateCountdownUI(){
+  const total=PASSENGER_TTL_MS/1000;
+  const mins=Math.floor(countdownRemaining/60);
+  const secs=countdownRemaining%60;
+  document.getElementById('countdownTime').textContent=String(mins).padStart(2,'0')+':'+String(secs).padStart(2,'0');
+  const pct=(countdownRemaining/total)*100;
+  const fill=document.getElementById('countdownFill');
+  fill.style.width=pct+'%';
+  if(pct>50){fill.style.background='linear-gradient(90deg, #1a3a7d, #2d5aa8)';}
+  else if(pct>20){fill.style.background='linear-gradient(90deg, #FFB74D, #FFA726)';}
+  else{fill.style.background='linear-gradient(90deg, #EF9A9A, #EF5350)';}
+}
+
+function stopCountdown(){
+  clearInterval(countdownInterval);countdownInterval=null;countdownRemaining=0;
+  document.getElementById('countdownBar').classList.remove('show');
+}
+
+function sbGet(table,params=''){
+  return fetch(`${SB_URL}/rest/v1/${table}${params}`,
+    {headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY}}).then(r=>r.json());
+}
+
+function calcDist(la1,lo1,la2,lo2){
+  const R=6371000,dL=(la2-la1)*Math.PI/180,dO=(lo2-lo1)*Math.PI/180;
+  const a=Math.sin(dL/2)**2+Math.cos(la1*Math.PI/180)*Math.cos(la2*Math.PI/180)*Math.sin(dO/2)**2;
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+function fmtDist(m){return m<1000?Math.round(m)+'م':(m/1000).toFixed(1)+'كم';}
+function escH(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function nowTime(){return new Date().toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'});}
+
+async function savePassengerLocation(lat,lng,routeName){
+  try{
+    await fetch(`${SB_URL}/rest/v1/passenger_locations`,{
+      method:'POST',
+      headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'},
+      body:JSON.stringify({id:passengerId,route_name:routeName||'',lat,lng})
+    });
+  }catch(e){console.error(e);}
+}
+
+async function deletePassengerLocation(){
+  try{
+    await fetch(`${SB_URL}/rest/v1/passenger_locations?id=eq.${passengerId}`,{
+      method:'DELETE',headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY}
+    });
+  }catch(e){console.error(e);}
+}
+
+async function cancelSelection(){
+  clearTimeout(autoExpireTimeout);autoExpireTimeout=null;
+  clearTimeout(arrivalCountdownTimeout);arrivalCountdownTimeout=null;
+  arrivalWarningShown=false;
+  stopCountdown();stopPing();
+  await deletePassengerLocation();
+  selectedRouteName=null;clearInterval(busInterval);
+  document.getElementById('busesCard').classList.add('hidden');
+  document.getElementById('cancelBtn').classList.remove('show');
+  document.querySelectorAll('.route-btn').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.route-badge').forEach(el=>{el.className='route-badge rb-idle';el.textContent=T[lang].choose;});
+  Object.values(routePolylines).forEach(arr=>arr.forEach(l=>{if(l&&l.setStyle)l.setStyle({weight:5,opacity:.75});}));
+  if(userMarker){userMarker.remove();userMarker=null;}
+  userLat=null;userLng=null;
+  updateLocationIndicator(null,null);
 }
 
 function getLocation(){
-  if(!navigator.geolocation){showToast(T[lang].locNo);return;}
+  if(!navigator.geolocation){
+    document.getElementById('locBtnLabel').textContent=T[lang].locNo;
+    return;
+  }
+  document.getElementById('locBtnLabel').textContent=T[lang].locating;
   navigator.geolocation.getCurrentPosition(
     pos=>{
-      userLat=pos.coords.latitude;
-      userLng=pos.coords.longitude;
+      userLat=pos.coords.latitude;userLng=pos.coords.longitude;
       updateLocationIndicator(userLat,userLng);
-      if(!map){initMapCore();}
-      else{
-        if(userMarker)userMarker.remove();
-        const uIcon=L.divIcon({className:'',html:`<div style="width:16px;height:16px;background:var(--primary);border:3px solid #fff;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,.4)"></div>`,iconSize:[16,16],iconAnchor:[8,8]});
-        userMarker=L.marker([userLat,userLng],{icon:uIcon,zIndexOffset:1000}).addTo(map).bindPopup(T[lang].myLoc);
-        map.setView([userLat,userLng],14);
-      }
+      initMap();
       if(selectedRouteName)savePassengerLocation(userLat,userLng,selectedRouteName);
     },
-    ()=>{showToast(T[lang].locErr);},
+    ()=>{
+      document.getElementById('locBtnLabel').textContent=T[lang].locErr;
+      document.getElementById('locationDot').classList.remove('ok');
+    },
     {enableHighAccuracy:true,timeout:12000}
   );
-}
-
-/* ✅ FIX: دالة مستقلة تشغّل الخريطة فوراً بدون انتظار GPS */
-function initMapCore(){
-  const centerLat=userLat!==null?userLat:37.0;
-  const centerLng=userLng!==null?userLng:35.32;
-  map=L.map('map',{zoomControl:true,attributionControl:false}).setView([centerLat,centerLng],13);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(map);
-  if(userLat!==null&&userLng!==null){
-    const uIcon=L.divIcon({className:'',html:`<div style="width:16px;height:16px;background:var(--primary);border:3px solid #fff;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,.4)"></div>`,iconSize:[16,16],iconAnchor:[8,8]});
-    userMarker=L.marker([userLat,userLng],{icon:uIcon,zIndexOffset:1000}).addTo(map).bindPopup(T[lang].myLoc);
-  }
 }
 
 function initMap(){
   document.getElementById('routesCard').classList.remove('hidden');
   openRoutesPanel();
-  if(!map)initMapCore();
+  if(!map){
+    map=L.map('map',{zoomControl:true,attributionControl:false}).setView([userLat,userLng],14);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(map);
+  }
+  if(userMarker)userMarker.remove();
+  const uIcon=L.divIcon({className:'',html:`<div style="width:16px;height:16px;background:var(--primary);border:3px solid #fff;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,.4)"></div>`,iconSize:[16,16],iconAnchor:[8,8]});
+  userMarker=L.marker([userLat,userLng],{icon:uIcon,zIndexOffset:1000}).addTo(map).bindPopup(T[lang].myLoc);
   loadRoutes();
 }
-
-function toggleRoutesPanel(){document.getElementById('routesCard').classList.toggle('open');}
-function openRoutesPanel(){document.getElementById('routesCard').classList.add('open');}
 
 async function loadRoutes(){
   document.getElementById('routesGrid').innerHTML='<div class="empty"><div class="empty-e">⏳</div>'+T[lang].loading+'</div>';
   try{
     const rows=await sbGet('routes','?select=id,route_name,direction,points,city&order=route_name');
-    if(!Array.isArray(rows)||rows.length===0){
-      document.getElementById('routesGrid').innerHTML='<div class="empty"><div class="empty-e">🚫</div>'+T[lang].noRoutes+'</div>';
-      return;
-    }
+    if(!Array.isArray(rows)||rows.length===0){document.getElementById('routesGrid').innerHTML='<div class="empty"><div class="empty-e">🚫</div>'+T[lang].noRoutes+'</div>';return;}
     const grouped={};
     rows.forEach(r=>{if(!grouped[r.route_name])grouped[r.route_name]=[];grouped[r.route_name].push(r);});
     Object.values(routePolylines).forEach(arr=>arr.forEach(l=>l&&l.remove&&l.remove()));
@@ -369,8 +1162,7 @@ async function loadRoutes(){
         const latlngs=pts.map(p=>[parseFloat(p.lat),parseFloat(p.lng)]);
         latlngs.forEach(p=>bounds.push(p));
         const poly=L.polyline(latlngs,{color,weight:5,opacity:.75,dashArray:seg.direction==='returning'?'10,8':null}).addTo(map);
-        poly.on('click',()=>selectRoute(rName,color));
-        routePolylines[rName].push(poly);
+        poly.on('click',()=>selectRoute(rName,color));routePolylines[rName].push(poly);
         const sd=L.circleMarker(latlngs[0],{radius:7,color:'#fff',weight:2,fillColor:color,fillOpacity:1}).addTo(map).bindPopup(`<b style="font-family:Cairo">${escH(rName)}</b><br>${seg.direction==='going'?T[lang].goStart:T[lang].retStart}`);
         routePolylines[rName].push(sd);
         const ed=L.circleMarker(latlngs[latlngs.length-1],{radius:7,color:'#fff',weight:2,fillColor:color,fillOpacity:1}).addTo(map).bindPopup(`<b style="font-family:Cairo">${escH(rName)}</b><br>${seg.direction==='going'?T[lang].goEnd:T[lang].retEnd}`);
@@ -418,8 +1210,7 @@ function selectRoute(rName,color){
     showToast(T[lang].noLocation);
     const btn=document.getElementById('getLocationBtn');
     if(btn){btn.classList.remove('shake-anim');void btn.offsetWidth;btn.classList.add('shake-anim');setTimeout(()=>btn.classList.remove('shake-anim'),700);}
-    getLocation();
-    return;
+    getLocation();return;
   }
   selectedRouteName=rName;selectedColor=color||routeColorMap[rName]||'#1E88E5';
   Object.entries(routePolylines).forEach(([name,layers])=>layers.forEach(l=>{if(!l||!l.setStyle)return;l.setStyle(name===rName?{weight:7,opacity:1}:{weight:3,opacity:.2});}));
@@ -452,12 +1243,12 @@ async function loadBuses(){
     const validBuses=(Array.isArray(buses)?buses:[]).filter(b=>{const la=parseFloat(b.lat),lo=parseFloat(b.lng);return !isNaN(la)&&!isNaN(lo)&&la!==0&&lo!==0;});
     if(!validBuses.length){list.innerHTML='<div class="empty"><div class="empty-e">😴</div>'+T[lang].noBuses+'</div>';return;}
     if(userLat!=null&&userLng!=null){
-      const arrived=validBuses.some(b=>{const la=parseFloat(b.lat),lo=parseFloat(b.lng);return calcDist(userLat,userLng,la,lo)<ARRIVAL_RADIUS_M;});
+      const arrived=validBuses.some(b=>calcDist(userLat,userLng,parseFloat(b.lat),parseFloat(b.lng))<ARRIVAL_RADIUS_M);
       if(arrived&&!arrivalWarningShown){
         arrivalWarningShown=true;showToast(T[lang].toastArrived);
         clearTimeout(autoExpireTimeout);autoExpireTimeout=null;
         startCountdown(ARRIVAL_COUNTDOWN_S);
-        arrivalCountdownTimeout=setTimeout(()=>{cancelSelection();},ARRIVAL_COUNTDOWN_S*1000);
+        arrivalCountdownTimeout=setTimeout(()=>cancelSelection(),ARRIVAL_COUNTDOWN_S*1000);
       }
       if(!arrived&&arrivalWarningShown){
         arrivalWarningShown=false;clearTimeout(arrivalCountdownTimeout);arrivalCountdownTimeout=null;
@@ -483,167 +1274,8 @@ async function loadBuses(){
   }
 }
 
-async function cancelSelection(){
-  clearTimeout(autoExpireTimeout);autoExpireTimeout=null;
-  clearTimeout(arrivalCountdownTimeout);arrivalCountdownTimeout=null;
-  arrivalWarningShown=false;stopCountdown();stopPing();
-  await deletePassengerLocation();
-  selectedRouteName=null;clearInterval(busInterval);
-  document.getElementById('busesCard').classList.add('hidden');
-  document.getElementById('cancelBtn').classList.remove('show');
-  document.querySelectorAll('.route-btn').forEach(el=>el.classList.remove('active'));
-  document.querySelectorAll('.route-badge').forEach(el=>{el.className='route-badge rb-idle';el.textContent=T[lang].choose;});
-  Object.values(routePolylines).forEach(arr=>arr.forEach(l=>{if(l&&l.setStyle)l.setStyle({weight:5,opacity:.75});}));
-  if(userMarker){userMarker.remove();userMarker=null;}
-  userLat=null;userLng=null;
-  updateLocationIndicator(null,null);
-}
-
-function startPing(){
-  clearInterval(pingInterval);
-  pingInterval=setInterval(async()=>{
-    if(selectedRouteName&&userLat!=null&&userLng!=null){
-      await savePassengerLocation(userLat,userLng,selectedRouteName);
-      console.log('💓 heartbeat',nowTime());
-    }
-  },PING_INTERVAL_MS);
-}
-function stopPing(){clearInterval(pingInterval);pingInterval=null;}
-
-function sendBeaconDelete(){
-  if(!selectedRouteName)return;
-  try{fetch(`${SB_URL}/rest/v1/passenger_locations?id=eq.${passengerId}`,{method:'DELETE',headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY},keepalive:true});}
-  catch(e){}
-}
-
-function startCountdown(totalSeconds){
-  countdownRemaining=totalSeconds;
-  document.getElementById('countdownBar').classList.add('show');
-  updateCountdownUI();
-  clearInterval(countdownInterval);
-  countdownInterval=setInterval(()=>{
-    countdownRemaining--;
-    if(countdownRemaining<=0){clearInterval(countdownInterval);countdownInterval=null;countdownRemaining=0;}
-    updateCountdownUI();
-  },1000);
-}
-function updateCountdownUI(){
-  const total=PASSENGER_TTL_MS/1000;
-  const mins=Math.floor(countdownRemaining/60);
-  const secs=countdownRemaining%60;
-  document.getElementById('countdownTime').textContent=String(mins).padStart(2,'0')+':'+String(secs).padStart(2,'0');
-  const pct=(countdownRemaining/total)*100;
-  const fill=document.getElementById('countdownFill');
-  fill.style.width=pct+'%';
-  if(pct>50){fill.style.background='linear-gradient(90deg,#1a3a7d,#2d5aa8)';}
-  else if(pct>20){fill.style.background='linear-gradient(90deg,#FFB74D,#FFA726)';}
-  else{fill.style.background='linear-gradient(90deg,#EF9A9A,#EF5350)';}
-}
-function stopCountdown(){
-  clearInterval(countdownInterval);countdownInterval=null;countdownRemaining=0;
-  document.getElementById('countdownBar').classList.remove('show');
-}
-
-function showToast(msg){
-  const t=document.getElementById('expireToast');
-  t.textContent=msg;t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),4000);
-}
-
-function sbGet(table,params=''){
-  return fetch(`${SB_URL}/rest/v1/${table}${params}`,{headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY}}).then(r=>r.json());
-}
-
-async function savePassengerLocation(lat,lng,routeName){
-  try{
-    const res=await fetch(`${SB_URL}/rest/v1/passenger_locations`,{
-      method:'POST',
-      headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'},
-      body:JSON.stringify({id:passengerId,route_name:routeName||'',lat,lng})
-    });
-    const data=await res.json();
-    console.log('savePassenger status:',res.status,data);
-  }catch(e){console.error('savePassenger error:',e);}
-}
-
-async function deletePassengerLocation(){
-  try{
-    await fetch(`${SB_URL}/rest/v1/passenger_locations?id=eq.${passengerId}`,{method:'DELETE',headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY}});
-  }catch(e){console.error(e);}
-}
-
-function calcDist(la1,lo1,la2,lo2){
-  const R=6371000,dL=(la2-la1)*Math.PI/180,dO=(lo2-lo1)*Math.PI/180;
-  const a=Math.sin(dL/2)**2+Math.cos(la1*Math.PI/180)*Math.cos(la2*Math.PI/180)*Math.sin(dO/2)**2;
-  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
-}
-function fmtDist(m){return m<1000?Math.round(m)+'م':(m/1000).toFixed(1)+'كم';}
-function escH(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function nowTime(){return new Date().toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'});}
-
-window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;});
-window.addEventListener('appinstalled',()=>{deferredPrompt=null;markInstalled();});
-
-function markInstalled(){
-  const btn=document.getElementById('installBtn');
-  document.getElementById('installBtnIcon').textContent='✅';
-  document.getElementById('installBtnTxt').textContent=T[lang].installedBtn;
-  btn.classList.add('installed');btn.disabled=true;
-  document.getElementById('iosHint').classList.remove('show');
-}
-async function triggerInstall(){
-  if(isStandalone){markInstalled();return;}
-  if(deferredPrompt){
-    deferredPrompt.prompt();
-    const choice=await deferredPrompt.userChoice;
-    deferredPrompt=null;
-    if(choice.outcome==='accepted')markInstalled();
-  }else if(isIOS){document.getElementById('iosHint').classList.toggle('show');}
-}
-function generateQR(){
-  const box=document.getElementById('qrBox');
-  box.innerHTML='';box.style.cursor='pointer';box.onclick=showQrOverlay;
-  const url=window.location.href.split('?')[0];
-  try{new QRCode(box,{text:url,width:48,height:48,colorDark:'#1565C0',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});}
-  catch(e){box.innerHTML='<div style="font-size:30px;line-height:48px;text-align:center">📱</div>';}
-  generateQRModal();
-}
-function generateQRModal(){
-  const box=document.getElementById('qrModalBox');box.innerHTML='';
-  const url=window.location.href.split('?')[0];
-  try{new QRCode(box,{text:url,width:260,height:260,colorDark:'#1565C0',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});}
-  catch(e){box.innerHTML='<div style="font-size:48px;line-height:260px;text-align:center">📱</div>';}
-}
-function showQrOverlay(){document.getElementById('qrOverlay').classList.add('show');}
-function closeQrOverlay(){document.getElementById('qrOverlay').classList.remove('show');}
-
-/* ✅ FIX: initAppCard يشغّل الخريطة فوراً بدون انتظار GPS */
-function initAppCard(){
-  generateQR();
-  document.getElementById('iosHint').innerHTML=T[lang].iosHint;
-  const ibt=document.getElementById('installBtnTxt');
-  if(ibt)ibt.textContent=T[lang].installBtn;
-  if(isStandalone){markInstalled();}
-  if(isIOS){document.getElementById('installBtn').style.display='inline-flex';}
-
-  /* تشغيل الخريطة وتحميل الخطوط فوراً */
-  document.getElementById('routesCard').classList.remove('hidden');
-  openRoutesPanel();
-  initMapCore();
-  loadRoutes();
-
-  /* محاولة GPS في الخلفية */
-  getLocation();
-}
-
-window.addEventListener('beforeunload',()=>{
-  clearTimeout(autoExpireTimeout);clearTimeout(arrivalCountdownTimeout);
-  clearInterval(countdownInterval);stopPing();sendBeaconDelete();
-});
-document.addEventListener('visibilitychange',()=>{
-  if(document.visibilityState==='hidden'&&selectedRouteName)sendBeaconDelete();
-});
-
+window.addEventListener('beforeunload',()=>{clearTimeout(autoExpireTimeout);clearTimeout(arrivalCountdownTimeout);clearInterval(countdownInterval);stopPing();sendBeaconDelete();});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'&&selectedRouteName)sendBeaconDelete();});
 window.addEventListener('load',initAppCard);
 </script>
 </body>
